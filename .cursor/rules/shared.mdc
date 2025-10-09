@@ -1,0 +1,70 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+
+# AI Rules for Cup of Tea (MVP)
+
+### Główny problem
+Zarządzanie kalendarzem i rezerwacjami jest czasochłonne dla lektorów języków obcych prowadzących lekcje online. Cup of Tea ułatwia organizację grafiku, automatyzuje umawianie lekcji przez uczniów oraz umożliwia śledzenie statystyk lekcji, płatności, zrealizowanych tematów.
+
+### Najmniejszy zestaw funkcjonalności
+- Logowanie i rejestracja użytkowników (lektor / uczeń)
+- Uczeń może zarejestrować się poprzez link wygenerowany przez lektora
+- Zarządzanie kalendarzem przez lektorów (dodawanie, edycja, usuwanie terminów w kalendarzu)
+- Rezerwacja dostępnych terminów przez uczniów (uczniowie widzą listę godzin dostępnych danego dnia. Przekreślone godziny oznaczają brak dostępności w kalendarzu lektora, godziny w które można kliknąć przenoszą do dalszych kroków rezerwacji)
+- Strona profilu użytkownika dla lektora – lista uczniów oraz statystyki lekcji (odbyte, planowane, płatności)
+- Strona profilu użytkownika dla ucznia - liczba odbytych lekcji i postępy z danym lektorem
+
+### Co NIE wchodzi w zakres MVP
+- Integracja kalendarza z zewnętrznymi usługami takimi jak Google Calendar
+- Funkcje społecznościowe (zapraszanie znajomych, czat, forum)
+- Tworzenie daily quests, czyli zadań na każdy dzień roku przez lektorów, np. quizzy czy analizy tekstów.
+- Rozwiązywanie questów przez uczniów
+- Elementy gamifikacji i odznaki
+
+### Kryteria sukcesu
+- 90% użytkowników (lektorów) aktualizuje kalendarz co najmniej kilka razy w miesiącu
+- 70% użytkowników (uczniów) umawia się na lekcję co najmniej raz w miesiącu
+
+## Tech Stack
+
+- Astro 5
+- TypeScript 5
+- React 19
+- Tailwind 4
+- Shadcn/ui
+
+## Project Structure
+
+When introducing changes to the project, always follow the directory structure below:
+
+- `./src` - source code
+- `./src/layouts` - Astro layouts
+- `./src/pages` - Astro pages
+- `./src/pages/api` - API endpoints
+- `./src/middleware/index.ts` - Astro middleware
+- `./src/db` - Supabase clients and types
+- `./src/types.ts` - Shared types for backend and frontend (Entities, DTOs)
+- `./src/components` - Client-side components written in Astro (static) and React (dynamic)
+- `./src/components/ui` - Client-side components from Shadcn/ui
+- `./src/lib` - Services and helpers
+- `./src/assets` - static internal assets
+- `./public` - public assets
+
+When modifying the directory structure, always update this section.
+
+## Coding practices
+
+### Guidelines for clean code
+
+- Use feedback from linters to improve the code when making changes.
+- Prioritize error handling and edge cases.
+- Handle errors and edge cases at the beginning of functions.
+- Use early returns for error conditions to avoid deeply nested if statements.
+- Place the happy path last in the function for improved readability.
+- Avoid unnecessary else statements; use if-return pattern instead.
+- Use guard clauses to handle preconditions and invalid states early.
+- Implement proper error logging and user-friendly error messages.
+- Consider using custom error types or error factories for consistent error handling.
