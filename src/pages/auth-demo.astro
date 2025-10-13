@@ -1,0 +1,165 @@
+---
+import Layout from "../layouts/Layout.astro";
+
+export const prerender = false;
+---
+
+<Layout title="Demo Formularzy Autentykacji - Cup of Tea">
+  <main class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-12">
+        <h1 class="text-4xl font-bold text-gray-900 mb-4">Cup of Tea</h1>
+        <p class="text-xl text-gray-600 mb-2">Demo Formularzy Autentykacji</p>
+        <p class="text-sm text-gray-500">
+          Wszystkie formularze są funkcjonalne z walidacją, ale backend zostanie zaimplementowany w następnym etapie
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Formularz logowania -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+          <h2 class="text-2xl font-bold text-gray-900 mb-4 text-center">Logowanie</h2>
+          <div id="login-form-container"></div>
+          <div class="mt-4 text-sm text-gray-600">
+            <p><strong>Funkcjonalność:</strong></p>
+            <ul class="list-disc list-inside space-y-1">
+              <li>Walidacja email i hasła</li>
+              <li>Obsługa błędów</li>
+              <li>Linki do rejestracji i odzyskiwania hasła</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Formularz rejestracji -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+          <h2 class="text-2xl font-bold text-gray-900 mb-4 text-center">Rejestracja</h2>
+          <div id="register-form-container"></div>
+          <div class="mt-4 text-sm text-gray-600">
+            <p><strong>Funkcjonalność:</strong></p>
+            <ul class="list-disc list-inside space-y-1">
+              <li>Walidacja wszystkich pól</li>
+              <li>Potwierdzenie hasła</li>
+              <li>Wybór roli (lektor/uczeń)</li>
+              <li>Obsługa linków zaproszeniowych</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Formularz odzyskiwania hasła -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+          <h2 class="text-2xl font-bold text-gray-900 mb-4 text-center">Odzyskiwanie hasła</h2>
+          <div id="forgot-password-form-container"></div>
+          <div class="mt-4 text-sm text-gray-600">
+            <p><strong>Funkcjonalność:</strong></p>
+            <ul class="list-disc list-inside space-y-1">
+              <li>Walidacja adresu email</li>
+              <li>Symulacja wysyłania linku</li>
+              <li>Link powrotu do logowania</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Formularz resetowania hasła -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+          <h2 class="text-2xl font-bold text-gray-900 mb-4 text-center">Resetowanie hasła</h2>
+          <div id="reset-password-form-container"></div>
+          <div class="mt-4 text-sm text-gray-600">
+            <p><strong>Funkcjonalność:</strong></p>
+            <ul class="list-disc list-inside space-y-1">
+              <li>Walidacja nowego hasła</li>
+              <li>Potwierdzenie hasła</li>
+              <li>Przekierowanie po zmianie</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sekcja z linkami zaproszeniowymi -->
+      <div class="mt-12 bg-white rounded-lg shadow-lg p-6">
+        <h2 class="text-2xl font-bold text-gray-900 mb-4 text-center">Testowanie Linków Zaproszeniowych</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <h3 class="text-lg font-semibold text-gray-800 mb-2">Rejestracja z zaproszeniem</h3>
+            <p class="text-sm text-gray-600 mb-3">
+              Kliknij poniższy link, aby przetestować rejestrację ucznia przez link zaproszeniowy:
+            </p>
+            <a
+              href="/register?token=demo-token&teacherId=demo-teacher-id"
+              class="inline-block bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors text-sm"
+            >
+              Rejestracja przez zaproszenie
+            </a>
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold text-gray-800 mb-2">Resetowanie hasła</h3>
+            <p class="text-sm text-gray-600 mb-3">
+              Kliknij poniższy link, aby przetestować formularz resetowania hasła:
+            </p>
+            <a
+              href="/reset-password?type=recovery&access_token=demo-access&refresh_token=demo-refresh"
+              class="inline-block bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors text-sm"
+            >
+              Reset hasła (z tokenem)
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Nawigacja -->
+      <div class="mt-8 text-center">
+        <div class="space-x-4">
+          <a href="/login" class="text-blue-600 hover:text-blue-800 underline">Strona logowania</a>
+          <a href="/register" class="text-blue-600 hover:text-blue-800 underline">Strona rejestracji</a>
+          <a href="/forgot-password" class="text-blue-600 hover:text-blue-800 underline">Odzyskiwanie hasła</a>
+          <a href="/" class="text-blue-600 hover:text-blue-800 underline">Strona główna</a>
+        </div>
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<script>
+  import { AuthForm } from "../components/AuthForm";
+  import { createRoot } from "react-dom/client";
+  import React from "react";
+
+  // Funkcje obsługujące formularze (placeholders)
+  const handleLogin = async () => {
+    alert("Logowanie zostanie zaimplementowane w następnym etapie");
+  };
+
+  const handleRegister = async () => {
+    alert("Rejestracja zostanie zaimplementowana w następnym etapie");
+  };
+
+  const handleForgotPassword = async (data: { email: string }) => {
+    alert(
+      `Link do resetowania hasła zostałby wysłany na adres: ${data.email}\n\nFunkcjonalność zostanie zaimplementowana w następnym etapie.`
+    );
+  };
+
+  const handleResetPassword = async () => {
+    alert("Hasło zostało zmienione!\n\nFunkcjonalność zostanie w pełni zaimplementowana w następnym etapie.");
+  };
+
+  // Renderowanie wszystkich formularzy
+  const containers = [
+    { id: "login-form-container", mode: "login", onSubmit: handleLogin },
+    { id: "register-form-container", mode: "register", onSubmit: handleRegister },
+    { id: "forgot-password-form-container", mode: "forgot-password", onSubmit: handleForgotPassword },
+    { id: "reset-password-form-container", mode: "reset-password", onSubmit: handleResetPassword },
+  ];
+
+  containers.forEach(({ id, mode, onSubmit }) => {
+    const container = document.getElementById(id);
+    if (container) {
+      const root = createRoot(container);
+      const props = {
+        mode: mode as "login" | "register" | "forgot-password" | "reset-password",
+        onSubmit,
+        isLoading: false,
+      };
+      root.render(React.createElement(AuthForm as any, props));
+    }
+  });
+</script>

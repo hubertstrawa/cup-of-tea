@@ -11,11 +11,29 @@ export const prerender = false;
  */
 export const GET: APIRoute = async ({ request, locals }) => {
   try {
+    // Get logged-in user info
+    const {
+      data: { user },
+    } = await locals.supabase.auth.getUser();
+
+    if (!user?.id) {
+      return new Response(
+        JSON.stringify({
+          error: "Authentication required",
+          message: "Użytkownik musi być zalogowany, aby pobrać daty.",
+        }),
+        { status: 401, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
     const url = new URL(request.url);
     const queryParams = Object.fromEntries(url.searchParams);
 
     // Validate query parameters
-    const validatedQuery = datesListQuerySchema.parse(queryParams);
+    const validatedQuery = datesListQuerySchema.parse({
+      ...queryParams,
+      teacherId: user.id, // Nadpisanie/zdefiniowanie teacherId jako logged-in user
+    });
 
     const datesService = new DatesService(locals.supabase);
     const result = await datesService.getDates(validatedQuery);
@@ -38,6 +56,10 @@ export const GET: APIRoute = async ({ request, locals }) => {
 export const POST: APIRoute = async ({ request, locals }) => {
   try {
     // Parse and validate request body
+    const {
+      data: { user },
+    } = await locals.supabase.auth.getUser();
+
     let body;
     try {
       body = await request.json();
@@ -55,12 +77,21 @@ export const POST: APIRoute = async ({ request, locals }) => {
       );
     }
 
+    console.log("user", user);
+
     const validatedData = createDateSchema.parse(body);
 
     console.log("validatedData", validatedData);
 
+    if (!user?.id) {
+      return new Response(JSON.stringify({ error: "User not found" }), {
+        status: 404,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
     const datesService = new DatesService(locals.supabase);
-    const result = await datesService.createDate(validatedData, DEFAULT_USER_ID);
+    const result = await datesService.createDate(validatedData, user.id);
     return new Response(JSON.stringify(result), {
       status: 201,
       headers: {

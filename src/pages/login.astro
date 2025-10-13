@@ -1,0 +1,52 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { AuthForm } from "../components/AuthForm";
+import { createSupabaseServerInstance } from "../db/supabase.client.ts";
+
+export const prerender = false;
+
+// Sprawdzenie czy użytkownik jest już zalogowany
+const supabase = createSupabaseServerInstance({
+  cookies: Astro.cookies,
+  headers: Astro.request.headers,
+});
+
+const {
+  data: { user },
+} = await supabase.auth.getUser();
+
+// Jeśli użytkownik jest już zalogowany, przekieruj do dashboard
+if (user) {
+  return Astro.redirect("/dashboard");
+}
+
+// Sprawdzenie czy jest komunikat z URL (np. po rejestracji)
+const url = new URL(Astro.request.url);
+const message = url.searchParams.get("message");
+
+let displayMessage = "";
+if (message === "confirm-email") {
+  displayMessage = "Sprawdź swoją skrzynkę e-mail i potwierdź adres przed zalogowaniem.";
+}
+---
+
+<Layout title="Logowanie - Cup of Tea">
+  <main class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8">
+      <div class="text-center">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Cup of Tea</h1>
+        <p class="text-gray-600">System zarządzania lekcjami języków obcych</p>
+      </div>
+
+      {
+        displayMessage && (
+          <div class="p-3 text-sm text-blue-600 bg-blue-50 border border-blue-200 rounded-md text-center">
+            {displayMessage}
+          </div>
+        )
+      }
+
+      <AuthForm mode="login" client:load />
+    </div>
+  </main>
+</Layout>

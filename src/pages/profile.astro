@@ -1,0 +1,25 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { DashboardLayout } from "@/components/DashboardLayout";
+import { ProfilePage } from "@/components/ProfilePage";
+
+// Pobranie danych użytkownika z middleware
+const user = Astro.locals.user;
+
+if (!user) {
+  return Astro.redirect("/login");
+}
+
+const userProps = {
+  firstName: user.firstName,
+  lastName: user.lastName,
+  email: user.email,
+  role: user.role,
+};
+---
+
+<Layout title="Profil - Cup of Tea">
+  <DashboardLayout user={userProps} activeView="profile" client:load>
+    <ProfilePage user={userProps} client:load />
+  </DashboardLayout>
+</Layout>

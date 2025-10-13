@@ -1,0 +1,25 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import CalendarWrapper from "@/components/CalendarWrapper";
+import { DashboardLayout } from "@/components/DashboardLayout";
+
+// Pobranie danych użytkownika z middleware
+const user = Astro.locals.user;
+
+if (!user) {
+  return Astro.redirect("/login");
+}
+
+const userProps = {
+  firstName: user.firstName,
+  lastName: user.lastName,
+  email: user.email,
+  role: user.role,
+};
+---
+
+<Layout title="Dashboard - Cup of Tea">
+  <DashboardLayout user={userProps} activeView="calendar" client:load>
+    <CalendarWrapper client:load />
+  </DashboardLayout>
+</Layout>

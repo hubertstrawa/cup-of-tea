@@ -10,6 +10,15 @@ import { updateDateSchema, dateIdParamSchema } from "../../../lib/validation/dat
 export const PUT: APIRoute = async ({ params, request, locals }) => {
   try {
     // Validate URL parameters
+    const {
+      data: { user },
+    } = await locals.supabase.auth.getUser();
+    if (!user?.id) {
+      return new Response(JSON.stringify({ error: "User not found" }), {
+        status: 404,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
     const validatedParams = dateIdParamSchema.parse(params);
 
     // Parse and validate request body
@@ -17,7 +26,7 @@ export const PUT: APIRoute = async ({ params, request, locals }) => {
     const validatedData = updateDateSchema.parse(body);
 
     const datesService = new DatesService(locals.supabase);
-    const result = await datesService.updateDate(validatedParams.id, validatedData, DEFAULT_USER_ID);
+    const result = await datesService.updateDate(validatedParams.id, validatedData, user.id);
 
     return new Response(JSON.stringify(result), {
       status: 200,
@@ -36,11 +45,20 @@ export const PUT: APIRoute = async ({ params, request, locals }) => {
  */
 export const DELETE: APIRoute = async ({ params, locals }) => {
   try {
+    const {
+      data: { user },
+    } = await locals.supabase.auth.getUser();
+    if (!user?.id) {
+      return new Response(JSON.stringify({ error: "User not found" }), {
+        status: 404,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
     // Validate URL parameters
     const validatedParams = dateIdParamSchema.parse(params);
 
     const datesService = new DatesService(locals.supabase);
-    const result = await datesService.deleteDate(validatedParams.id, DEFAULT_USER_ID);
+    const result = await datesService.deleteDate(validatedParams.id, user.id);
 
     return new Response(JSON.stringify(result), {
       status: 200,

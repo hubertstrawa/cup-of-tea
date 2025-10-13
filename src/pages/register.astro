@@ -1,0 +1,124 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { AuthForm } from "../components/AuthForm";
+
+export const prerender = false;
+
+// Pobranie parametrów URL
+const url = new URL(Astro.request.url);
+const invitationToken = url.searchParams.get("token");
+const teacherId = url.searchParams.get("teacherId");
+
+// Sprawdzenie czy użytkownik jest już zalogowany
+// (w przyszłości będzie to obsługiwane przez middleware)
+// const { supabase } = Astro.locals;
+// const { data: { session } } = await supabase.auth.getSession();
+//
+// if (session) {
+//   return Astro.redirect('/dashboard');
+// }
+
+// Walidacja tokenu zaproszeniowego (jeśli istnieje)
+let validatedTeacherId: string | undefined;
+let teacherName: string | undefined;
+let invitationError: string | undefined;
+
+if (invitationToken) {
+  // TODO: Implementacja walidacji tokenu
+  // const invitationService = new InvitationService(supabase);
+  // try {
+  //   validatedTeacherId = await invitationService.validateInvitationToken(invitationToken);
+  //   if (validatedTeacherId) {
+  //     // Pobranie nazwy lektora
+  //     const { data: teacher } = await supabase
+  //       .from('users')
+  //       .select('first_name, last_name')
+  //       .eq('id', validatedTeacherId)
+  //       .single();
+  //     teacherName = teacher ? `${teacher.first_name} ${teacher.last_name}` : undefined;
+  //   } else {
+  //     invitationError = 'Link zaproszeniowy jest nieprawidłowy lub wygasł.';
+  //   }
+  // } catch (error) {
+  //   invitationError = 'Wystąpił błąd podczas sprawdzania linku zaproszeniowego.';
+  // }
+
+  // Tymczasowe zachowanie dla demonstracji
+  validatedTeacherId = teacherId || "demo-teacher-id";
+  teacherName = "Jan Kowalski (Demo)";
+} else if (teacherId) {
+  validatedTeacherId = teacherId;
+}
+
+// Funkcja obsługująca rejestrację (placeholder)
+const handleRegister = async () => {
+  // TODO: Implementacja rejestracji przez Supabase Auth
+  // const { data: authData, error } = await supabase.auth.signUp({
+  //   email: data.email,
+  //   password: data.password,
+  //   options: {
+  //     data: {
+  //       first_name: data.firstName,
+  //       last_name: data.lastName,
+  //       role: data.role,
+  //       teacher_id: data.teacherId
+  //     }
+  //   }
+  // });
+
+  // if (error) {
+  //   throw new Error(error.message);
+  // }
+
+  // Przekierowanie po udanej rejestracji
+  // window.location.href = '/dashboard';
+
+  // Tymczasowe zachowanie dla demonstracji
+  console.log("Rejestracja zostanie zaimplementowana w następnym etapie");
+};
+---
+
+<Layout title="Rejestracja - Cup of Tea">
+  <main class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8">
+      <div class="text-center">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Cup of Tea</h1>
+        <p class="text-gray-600">System zarządzania lekcjami języków obcych</p>
+
+        {
+          invitationToken && teacherName && !invitationError && (
+            <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <p class="text-sm text-blue-800">
+                <strong>Zaproszenie od lektora:</strong> {teacherName}
+              </p>
+              <p class="text-xs text-blue-600 mt-1">Rejestrujesz się jako uczeń tego lektora</p>
+            </div>
+          )
+        }
+
+        {
+          invitationError && (
+            <div class="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <p class="text-sm text-red-800">{invitationError}</p>
+              <a href="/register" class="text-xs text-red-600 hover:text-red-800 underline mt-1 inline-block">
+                Przejdź do zwykłej rejestracji
+              </a>
+            </div>
+          )
+        }
+      </div>
+
+      {
+        !invitationError && (
+          <AuthForm
+            mode="register"
+            teacherId={validatedTeacherId}
+            onSubmit={handleRegister}
+            isLoading={false}
+            client:load
+          />
+        )
+      }
+    </div>
+  </main>
+</Layout>
