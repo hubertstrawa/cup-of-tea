@@ -82,4 +82,3 @@ Lektorzy języków obcych tracą czas na ręczne zarządzanie swoim kalendarzem 
 - Minimum 70% uczniów dokonuje rezerwacji co najmniej jednej lekcji miesięcznie.
 - Wskaźnik udanych rezerwacji oraz liczba wykorzystanych darmowych lekcji są monitorowane w celu oceny efektywności działania systemu.
 - Pozytywne opinie użytkowników dotyczące intuicyjności interfejsu oraz szybkości działania aplikacji.
-- Stabilność aplikacji potwierdzona testami obciążeniowymi, zwłaszcza w momentach intensywnego korzystania z systemu rezerwacji
