@@ -25,7 +25,7 @@ export default function AvailabilityChecker() {
     try {
       setLoading(true);
       const dateString = format(selectedDate, "yyyy-MM-dd");
-      const response = await fetch(`/api/dates?date=${dateString}&status=dostępny`);
+      const response = await fetch(`/api/dates?date=${dateString}&status=available`);
 
       if (!response.ok) {
         throw new Error("Failed to fetch available slots");

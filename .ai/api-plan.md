@@ -21,7 +21,7 @@
       "last_name": "string",
       "email": "string",
       "password": "string",
-      "role": "lektor"
+      "role": "tutor"
     }
     ```
   - Response JSON:
@@ -65,7 +65,7 @@
   - Creates a new availability slot for a teacher.
   - Request JSON:
     ```json
-    { "start_time": "timestamp", "end_time": "timestamp", "status": "dostępny", "additional_info": {} }
+    { "start_time": "timestamp", "end_time": "timestamp", "status": "available", "additional_info": {} }
     ```
   - Validation: Ensures `end_time` > `start_time`.
   - Response JSON:
@@ -202,7 +202,7 @@
 
 ## 4. Validation and Business Logic
 - **Validation Rules**:
-  - Users: Validate required fields; ensure email format and role (lektor or uczeń).
+  - Users: Validate required fields; ensure email format and role (tutor or student).
   - Dates: Validate `end_time` > `start_time`; only the teacher owner can modify.
   - Reservations: Enforce one reservation per date slot and limit free lessons per student.
   - Lessons: Validate that the associated reservation exists; lesson duration must be positive.

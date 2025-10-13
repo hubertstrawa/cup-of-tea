@@ -7,7 +7,7 @@ This table stores additional user profile information and extends the Supabase A
 - **id**: UUID, PRIMARY KEY, references `auth.users(id)` on delete cascade
 - **first_name**: VARCHAR(255) NOT NULL
 - **last_name**: VARCHAR(255) NOT NULL
-- **role**: user_role enum, NOT NULL, CHECK (role IN ('lektor', 'uczeń'))
+- **role**: user_role enum, NOT NULL, CHECK (role IN ('tutor', 'student'))
 - **profile_created_at**: TIMESTAMPTZ, NOT NULL, DEFAULT NOW()
 - **last_login_at**: TIMESTAMPTZ
 - **student_id**: UUID, NOT NULL, REFERENCES `users(id)`
@@ -19,7 +19,7 @@ _Note: The Supabase Auth system manages core fields such as email and encrypted 
 - **id**: UUID, PRIMARY KEY
 - **start_time**: TIMESTAMPTZ, NOT NULL
 - **end_time**: TIMESTAMPTZ, NOT NULL
-- **status**: date_status enum, NOT NULL, default 'dostępny', CHECK (status IN ('dostępny', 'zarezerwowany', 'anulowany'))
+- **status**: date_status enum, NOT NULL, default 'available', CHECK (status IN ('available', 'booked', 'canceled'))
 - **teacher_id**: UUID, NOT NULL, REFERENCES `users(id)`
 - **additional_info**: JSONB, DEFAULT '{}'::jsonb  
 Additional constraint: `end_time > start_time`
@@ -29,7 +29,7 @@ Additional constraint: `end_time > start_time`
 - **term_id**: UUID, NOT NULL, REFERENCES `dates(id)` ON DELETE CASCADE, UNIQUE (one reservation per time slot)
 - **student_id**: UUID, NOT NULL, REFERENCES `users(id)`
 - **reserved_at**: TIMESTAMPTZ, NOT NULL, DEFAULT NOW()
-- **status**: reservation_status enum, NOT NULL, default 'potwierdzona', CHECK (status IN ('potwierdzona', 'anulowana'))
+- **status**: reservation_status enum, NOT NULL, default 'confirmed', CHECK (status IN ('confirmed', 'canceled'))
 - **notes**: TEXT
 
 ### 4. notifications
@@ -46,7 +46,7 @@ Additional constraint: `end_time > start_time`
 - **student_id**: UUID, NOT NULL, REFERENCES `users(id)`
 - **scheduled_at**: TIMESTAMPTZ, NOT NULL
 - **duration_minutes**: INTEGER, NOT NULL, CHECK (duration_minutes > 0)
-- **status**: lesson_status enum, NOT NULL, default 'zaplanowana', CHECK (status IN ('zaplanowana', 'zakończona', 'anulowana'))
+- **status**: lesson_status enum, NOT NULL, default 'planned', CHECK (status IN ('planned', 'completed', 'canceled'))
 
 ### 6. error_logs
 - **id**: BIGSERIAL, PRIMARY KEY

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 interface User {
   id: string;
   email: string;
-  role: "teacher" | "student";
+  role: "tutor" | "student";
   firstName: string;
   lastName: string;
 }
@@ -66,7 +66,7 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children, onAuthChange }) 
           const mockUser: User = {
             id: "demo-user-id",
             email: "demo@example.com",
-            role: Math.random() > 0.5 ? "teacher" : "student",
+            role: Math.random() > 0.5 ? "tutor" : "student",
             firstName: "Jan",
             lastName: "Kowalski",
           };
@@ -103,7 +103,7 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children, onAuthChange }) 
       const mockUser: User = {
         id: userId,
         email: "demo@example.com",
-        role: "teacher",
+        role: "tutor",
         firstName: "Jan",
         lastName: "Kowalski",
       };

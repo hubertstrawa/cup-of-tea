@@ -120,7 +120,7 @@ GET  /api/auth/user
 #### Istniejące endpointy do zabezpieczenia
 ```
 GET    /api/dates (wymaga autentykacji)
-POST   /api/dates (wymaga autentykacji + rola lektora)
+POST   /api/dates (wymaga autentykacji + rola tutor (lektor))
 PUT    /api/dates/[id] (wymaga autentykacji + własność zasobu)
 DELETE /api/dates/[id] (wymaga autentykacji + własność zasobu)
 ```

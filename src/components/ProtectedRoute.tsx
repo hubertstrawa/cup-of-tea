@@ -3,14 +3,14 @@ import React, { useEffect, useState } from "react";
 interface User {
   id: string;
   email: string;
-  role: "teacher" | "student";
+  role: "tutor" | "student";
   firstName: string;
   lastName: string;
 }
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  requiredRole?: "teacher" | "student";
+  requiredRole?: "tutor" | "student";
   fallback?: React.ReactNode;
   redirectTo?: string;
 }
@@ -60,7 +60,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
         const mockUser: User = {
           id: "demo-user-id",
           email: "demo@example.com",
-          role: "teacher",
+          role: "tutor",
           firstName: "Jan",
           lastName: "Kowalski",
         };
@@ -160,9 +160,9 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
             </svg>
             <h3 className="text-lg font-medium text-yellow-800 mb-2">Brak uprawnień</h3>
             <p className="text-sm text-yellow-600 mb-4">
-              Ta strona jest dostępna tylko dla użytkowników z rolą: {requiredRole === "teacher" ? "Lektor" : "Uczeń"}
+              Ta strona jest dostępna tylko dla użytkowników z rolą: {requiredRole === "tutor" ? "Lektor" : "Uczeń"}
             </p>
-            <p className="text-xs text-yellow-600 mb-4">Twoja rola: {user.role === "teacher" ? "Lektor" : "Uczeń"}</p>
+            <p className="text-xs text-yellow-600 mb-4">Twoja rola: {user.role === "tutor" ? "Lektor" : "Uczeń"}</p>
             <button
               onClick={() => window.history.back()}
               className="bg-yellow-600 text-white px-4 py-2 rounded-md hover:bg-yellow-700 transition-colors"

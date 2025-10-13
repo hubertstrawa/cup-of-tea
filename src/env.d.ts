@@ -7,7 +7,7 @@ import type { Database } from "./db/database.types.ts";
 export interface AuthUser {
   id: string;
   email: string;
-  role: "teacher" | "student";
+  role: "tutor" | "student";
   firstName: string;
   lastName: string;
   emailConfirmed: boolean;

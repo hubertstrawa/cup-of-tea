@@ -1,24 +1,24 @@
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { 
-  LoginSchema, 
-  RegisterSchema, 
-  ForgotPasswordSchema, 
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import {
+  LoginSchema,
+  RegisterSchema,
+  ForgotPasswordSchema,
   ResetPasswordSchema,
   type LoginFormData,
   type RegisterFormData,
   type ForgotPasswordFormData,
-  type ResetPasswordFormData
-} from '../lib/validation/auth.schemas';
-import { authService } from '../lib/services/auth.service';
+  type ResetPasswordFormData,
+} from "../lib/validation/auth.schemas";
+import { authService } from "../lib/services/auth.service";
 
-type AuthMode = 'login' | 'register' | 'forgot-password' | 'reset-password';
+type AuthMode = "login" | "register" | "forgot-password" | "reset-password";
 
 interface BaseAuthFormProps {
   isLoading?: boolean;
@@ -26,80 +26,80 @@ interface BaseAuthFormProps {
 }
 
 interface LoginFormProps extends BaseAuthFormProps {
-  mode: 'login';
+  mode: "login";
 }
 
 interface RegisterFormProps extends BaseAuthFormProps {
-  mode: 'register';
+  mode: "register";
   teacherId?: string;
 }
 
 interface ForgotPasswordFormProps extends BaseAuthFormProps {
-  mode: 'forgot-password';
+  mode: "forgot-password";
 }
 
 interface ResetPasswordFormProps extends BaseAuthFormProps {
-  mode: 'reset-password';
+  mode: "reset-password";
 }
 
 type AuthFormProps = LoginFormProps | RegisterFormProps | ForgotPasswordFormProps | ResetPasswordFormProps;
 
 const getFormConfig = (mode: AuthMode) => {
   switch (mode) {
-    case 'login':
+    case "login":
       return {
-        title: 'Zaloguj się',
-        description: 'Wprowadź swoje dane aby się zalogować',
-        submitText: 'Zaloguj się'
+        title: "Zaloguj się",
+        description: "Wprowadź swoje dane aby się zalogować",
+        submitText: "Zaloguj się",
       };
-    case 'register':
+    case "register":
       return {
-        title: 'Utwórz konto',
-        description: 'Wypełnij formularz aby utworzyć nowe konto',
-        submitText: 'Utwórz konto'
+        title: "Utwórz konto",
+        description: "Wypełnij formularz aby utworzyć nowe konto",
+        submitText: "Utwórz konto",
       };
-    case 'forgot-password':
+    case "forgot-password":
       return {
-        title: 'Odzyskaj hasło',
-        description: 'Wprowadź adres e-mail aby otrzymać link do resetowania hasła',
-        submitText: 'Wyślij link'
+        title: "Odzyskaj hasło",
+        description: "Wprowadź adres e-mail aby otrzymać link do resetowania hasła",
+        submitText: "Wyślij link",
       };
-    case 'reset-password':
+    case "reset-password":
       return {
-        title: 'Ustaw nowe hasło',
-        description: 'Wprowadź nowe hasło dla swojego konta',
-        submitText: 'Zmień hasło'
+        title: "Ustaw nowe hasło",
+        description: "Wprowadź nowe hasło dla swojego konta",
+        submitText: "Zmień hasło",
       };
   }
 };
 
 // Komponent dla logowania
 const LoginForm: React.FC<LoginFormProps> = ({ isLoading: externalLoading = false, error }) => {
-  const config = getFormConfig('login');
-  const [submitError, setSubmitError] = useState<string>('');
+  const config = getFormConfig("login");
+  const [submitError, setSubmitError] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
 
   const {
     register,
     handleSubmit,
-    formState: { errors }
+    formState: { errors },
   } = useForm<LoginFormData>({
-    resolver: zodResolver(LoginSchema)
+    resolver: zodResolver(LoginSchema),
   });
 
   const handleFormSubmit = async (data: LoginFormData) => {
     try {
-      setSubmitError('');
+      setSubmitError("");
       setIsLoading(true);
-      
+
       const response = await authService.login(data);
-      
+
       // Client-side redirect po udanym logowaniu
       if (response.user) {
         authService.redirectAfterLogin(response.user.role);
       }
     } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : 'Wystąpił błąd');
+      setSubmitError(err instanceof Error ? err.message : "Wystąpił błąd");
     } finally {
       setIsLoading(false);
     }
@@ -117,30 +117,14 @@ const LoginForm: React.FC<LoginFormProps> = ({ isLoading: externalLoading = fals
         <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">Adres e-mail</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="twoj@email.com"
-              {...register('email')}
-              disabled={loading}
-            />
-            {errors.email && (
-              <p className="text-sm text-red-600">{errors.email.message}</p>
-            )}
+            <Input id="email" type="email" placeholder="twoj@email.com" {...register("email")} disabled={loading} />
+            {errors.email && <p className="text-sm text-red-600">{errors.email.message}</p>}
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="password">Hasło</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              {...register('password')}
-              disabled={loading}
-            />
-            {errors.password && (
-              <p className="text-sm text-red-600">{errors.password.message}</p>
-            )}
+            <Input id="password" type="password" placeholder="••••••••" {...register("password")} disabled={loading} />
+            {errors.password && <p className="text-sm text-red-600">{errors.password.message}</p>}
           </div>
 
           {(error || submitError) && (
@@ -150,7 +134,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ isLoading: externalLoading = fals
           )}
 
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? 'Ładowanie...' : config.submitText}
+            {loading ? "Ładowanie..." : config.submitText}
           </Button>
 
           <div className="space-y-2 text-center text-sm">
@@ -160,7 +144,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ isLoading: externalLoading = fals
               </a>
             </div>
             <div>
-              Nie masz konta?{' '}
+              Nie masz konta?{" "}
               <a href="/register" className="text-blue-600 hover:text-blue-800 hover:underline">
                 Zarejestruj się
               </a>
@@ -174,8 +158,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ isLoading: externalLoading = fals
 
 // Komponent dla rejestracji
 const RegisterForm: React.FC<RegisterFormProps> = ({ teacherId, isLoading: externalLoading = false, error }) => {
-  const config = getFormConfig('register');
-  const [submitError, setSubmitError] = useState<string>('');
+  const config = getFormConfig("register");
+  const [submitError, setSubmitError] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
 
   const {
@@ -183,25 +167,25 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ teacherId, isLoading: exter
     handleSubmit,
     setValue,
     watch,
-    formState: { errors }
+    formState: { errors },
   } = useForm<RegisterFormData>({
     resolver: zodResolver(RegisterSchema),
-    defaultValues: teacherId ? { teacherId, role: 'student' } : {}
+    defaultValues: teacherId ? { teacherId, role: "student" } : {},
   });
 
-  const watchedRole = watch('role');
+  const watchedRole = watch("role");
 
   const handleFormSubmit = async (data: RegisterFormData) => {
     try {
-      setSubmitError('');
+      setSubmitError("");
       setIsLoading(true);
-      
+
       const response = await authService.register(data);
-      
+
       // Client-side redirect po udanej rejestracji
       authService.redirectAfterRegister(response.requiresEmailConfirmation);
     } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : 'Wystąpił błąd');
+      setSubmitError(err instanceof Error ? err.message : "Wystąpił błąd");
     } finally {
       setIsLoading(false);
     }
@@ -219,30 +203,14 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ teacherId, isLoading: exter
         <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">Adres e-mail</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="twoj@email.com"
-              {...register('email')}
-              disabled={loading}
-            />
-            {errors.email && (
-              <p className="text-sm text-red-600">{errors.email.message}</p>
-            )}
+            <Input id="email" type="email" placeholder="twoj@email.com" {...register("email")} disabled={loading} />
+            {errors.email && <p className="text-sm text-red-600">{errors.email.message}</p>}
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="password">Hasło</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              {...register('password')}
-              disabled={loading}
-            />
-            {errors.password && (
-              <p className="text-sm text-red-600">{errors.password.message}</p>
-            )}
+            <Input id="password" type="password" placeholder="••••••••" {...register("password")} disabled={loading} />
+            {errors.password && <p className="text-sm text-red-600">{errors.password.message}</p>}
           </div>
 
           <div className="space-y-2">
@@ -251,38 +219,22 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ teacherId, isLoading: exter
               id="confirmPassword"
               type="password"
               placeholder="••••••••"
-              {...register('confirmPassword')}
+              {...register("confirmPassword")}
               disabled={loading}
             />
-            {errors.confirmPassword && (
-              <p className="text-sm text-red-600">{errors.confirmPassword.message}</p>
-            )}
+            {errors.confirmPassword && <p className="text-sm text-red-600">{errors.confirmPassword.message}</p>}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="firstName">Imię</Label>
-              <Input
-                id="firstName"
-                placeholder="Jan"
-                {...register('firstName')}
-                disabled={loading}
-              />
-              {errors.firstName && (
-                <p className="text-sm text-red-600">{errors.firstName.message}</p>
-              )}
+              <Input id="firstName" placeholder="Jan" {...register("firstName")} disabled={loading} />
+              {errors.firstName && <p className="text-sm text-red-600">{errors.firstName.message}</p>}
             </div>
             <div className="space-y-2">
               <Label htmlFor="lastName">Nazwisko</Label>
-              <Input
-                id="lastName"
-                placeholder="Kowalski"
-                {...register('lastName')}
-                disabled={loading}
-              />
-              {errors.lastName && (
-                <p className="text-sm text-red-600">{errors.lastName.message}</p>
-              )}
+              <Input id="lastName" placeholder="Kowalski" {...register("lastName")} disabled={loading} />
+              {errors.lastName && <p className="text-sm text-red-600">{errors.lastName.message}</p>}
             </div>
           </div>
 
@@ -290,7 +242,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ teacherId, isLoading: exter
             <div className="space-y-2">
               <Label htmlFor="role">Rola</Label>
               <Select
-                onValueChange={(value) => setValue('role', value as 'teacher' | 'student')}
+                onValueChange={(value) => setValue("role", value as "tutor" | "student")}
                 defaultValue={watchedRole}
                 disabled={loading}
               >
@@ -298,19 +250,15 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ teacherId, isLoading: exter
                   <SelectValue placeholder="Wybierz rolę" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="teacher">Lektor</SelectItem>
+                  <SelectItem value="tutor">Lektor</SelectItem>
                   <SelectItem value="student">Uczeń</SelectItem>
                 </SelectContent>
               </Select>
-              {errors.role && (
-                <p className="text-sm text-red-600">{errors.role.message}</p>
-              )}
+              {errors.role && <p className="text-sm text-red-600">{errors.role.message}</p>}
             </div>
           )}
 
-          {teacherId && (
-            <input type="hidden" {...register('teacherId')} value={teacherId} />
-          )}
+          {teacherId && <input type="hidden" {...register("teacherId")} value={teacherId} />}
 
           {(error || submitError) && (
             <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
@@ -319,12 +267,12 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ teacherId, isLoading: exter
           )}
 
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? 'Ładowanie...' : config.submitText}
+            {loading ? "Ładowanie..." : config.submitText}
           </Button>
 
           <div className="space-y-2 text-center text-sm">
             <div>
-              Masz już konto?{' '}
+              Masz już konto?{" "}
               <a href="/login" className="text-blue-600 hover:text-blue-800 hover:underline">
                 Zaloguj się
               </a>
@@ -338,28 +286,28 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ teacherId, isLoading: exter
 
 // Komponent dla odzyskiwania hasła
 const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ isLoading: externalLoading = false, error }) => {
-  const config = getFormConfig('forgot-password');
-  const [submitError, setSubmitError] = useState<string>('');
+  const config = getFormConfig("forgot-password");
+  const [submitError, setSubmitError] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
   const {
     register,
     handleSubmit,
-    formState: { errors }
+    formState: { errors },
   } = useForm<ForgotPasswordFormData>({
-    resolver: zodResolver(ForgotPasswordSchema)
+    resolver: zodResolver(ForgotPasswordSchema),
   });
 
   const handleFormSubmit = async (data: ForgotPasswordFormData) => {
     try {
-      setSubmitError('');
+      setSubmitError("");
       setIsLoading(true);
-      
-      const response = await authService.forgotPassword(data);
+      //const response =
+      await authService.forgotPassword(data);
       setSuccess(true);
     } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : 'Wystąpił błąd');
+      setSubmitError(err instanceof Error ? err.message : "Wystąpił błąd");
     } finally {
       setIsLoading(false);
     }
@@ -389,16 +337,8 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ isLoading: exte
           <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Adres e-mail</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="twoj@email.com"
-                {...register('email')}
-                disabled={loading}
-              />
-              {errors.email && (
-                <p className="text-sm text-red-600">{errors.email.message}</p>
-              )}
+              <Input id="email" type="email" placeholder="twoj@email.com" {...register("email")} disabled={loading} />
+              {errors.email && <p className="text-sm text-red-600">{errors.email.message}</p>}
             </div>
 
             {(error || submitError) && (
@@ -408,7 +348,7 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ isLoading: exte
             )}
 
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Ładowanie...' : config.submitText}
+              {loading ? "Ładowanie..." : config.submitText}
             </Button>
 
             <div className="space-y-2 text-center text-sm">
@@ -427,28 +367,29 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ isLoading: exte
 
 // Komponent dla resetowania hasła
 const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ isLoading: externalLoading = false, error }) => {
-  const config = getFormConfig('reset-password');
-  const [submitError, setSubmitError] = useState<string>('');
+  const config = getFormConfig("reset-password");
+  const [submitError, setSubmitError] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
   const {
     register,
     handleSubmit,
-    formState: { errors }
+    formState: { errors },
   } = useForm<ResetPasswordFormData>({
-    resolver: zodResolver(ResetPasswordSchema)
+    resolver: zodResolver(ResetPasswordSchema),
   });
 
   const handleFormSubmit = async (data: ResetPasswordFormData) => {
     try {
-      setSubmitError('');
+      setSubmitError("");
       setIsLoading(true);
-      
-      const response = await authService.resetPassword(data);
+
+      // const response =
+      await authService.resetPassword(data);
       setSuccess(true);
     } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : 'Wystąpił błąd');
+      setSubmitError(err instanceof Error ? err.message : "Wystąpił błąd");
     } finally {
       setIsLoading(false);
     }
@@ -482,12 +423,10 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ isLoading: extern
                 id="password"
                 type="password"
                 placeholder="••••••••"
-                {...register('password')}
+                {...register("password")}
                 disabled={loading}
               />
-              {errors.password && (
-                <p className="text-sm text-red-600">{errors.password.message}</p>
-              )}
+              {errors.password && <p className="text-sm text-red-600">{errors.password.message}</p>}
             </div>
 
             <div className="space-y-2">
@@ -496,12 +435,10 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ isLoading: extern
                 id="confirmPassword"
                 type="password"
                 placeholder="••••••••"
-                {...register('confirmPassword')}
+                {...register("confirmPassword")}
                 disabled={loading}
               />
-              {errors.confirmPassword && (
-                <p className="text-sm text-red-600">{errors.confirmPassword.message}</p>
-              )}
+              {errors.confirmPassword && <p className="text-sm text-red-600">{errors.confirmPassword.message}</p>}
             </div>
 
             {(error || submitError) && (
@@ -511,7 +448,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ isLoading: extern
             )}
 
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Ładowanie...' : config.submitText}
+              {loading ? "Ładowanie..." : config.submitText}
             </Button>
 
             <div className="space-y-2 text-center text-sm">
@@ -531,13 +468,13 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ isLoading: extern
 // Główny komponent AuthForm
 export const AuthForm: React.FC<AuthFormProps> = (props) => {
   switch (props.mode) {
-    case 'login':
+    case "login":
       return <LoginForm {...props} />;
-    case 'register':
+    case "register":
       return <RegisterForm {...props} />;
-    case 'forgot-password':
+    case "forgot-password":
       return <ForgotPasswordForm {...props} />;
-    case 'reset-password':
+    case "reset-password":
       return <ResetPasswordForm {...props} />;
     default:
       return null;

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button } from "./ui/button";
 import { ScrollArea } from "./ui/scroll-area";
-import { Separator } from "./ui/separator";
+// import { Separator } from "./ui/separator";
 import { LogoutButton } from "./LogoutButton";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 
@@ -12,7 +12,7 @@ interface DashboardLayoutProps {
     firstName: string;
     lastName: string;
     email: string;
-    role: "teacher" | "student";
+    role: "tutor" | "student";
   };
 }
 
@@ -34,7 +34,12 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, user
       label: "Kalendarz",
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+          />
         </svg>
       ),
       href: "/dashboard",
@@ -45,7 +50,12 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, user
       label: "Profil",
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+          />
         </svg>
       ),
       href: "/profile",
@@ -57,18 +67,15 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, user
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
   };
 
-  const getRoleLabel = (role: "teacher" | "student") => {
-    return role === "teacher" ? "Lektor" : "Uczeń";
+  const getRoleLabel = (role: "tutor" | "student") => {
+    return role === "tutor" ? "Lektor" : "Uczeń";
   };
 
   return (
     <div className="flex h-screen bg-gray-50">
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
+        <div className="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden" onClick={() => setSidebarOpen(false)} />
       )}
 
       {/* Sidebar */}
@@ -88,12 +95,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, user
               </div>
               <h1 className="text-xl font-bold text-gray-900">Cup of Tea</h1>
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="lg:hidden"
-              onClick={() => setSidebarOpen(false)}
-            >
+            <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setSidebarOpen(false)}>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
@@ -156,7 +158,12 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, user
               className="w-full justify-start space-x-3 text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                />
               </svg>
               <span>Wyloguj się</span>
             </LogoutButton>
@@ -169,11 +176,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, user
         {/* Top Bar */}
         <header className="bg-white shadow-sm border-b lg:hidden">
           <div className="flex items-center justify-between p-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setSidebarOpen(true)}
-            >
+            <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(true)}>
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
@@ -185,9 +188,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, user
 
         {/* Main Content Area */}
         <main className="flex-1 overflow-auto bg-gray-50">
-          <div className="h-full">
-            {children}
-          </div>
+          <div className="h-full">{children}</div>
         </main>
       </div>
     </div>

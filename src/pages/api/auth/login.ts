@@ -66,7 +66,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       user: {
         id: data.user.id,
         email: data.user.email,
-        role: userProfile.role === "lektor" ? "teacher" : "student",
+        role: userProfile.role === "tutor" ? "tutor" : "student",
         firstName: userProfile.first_name,
         lastName: userProfile.last_name,
         emailConfirmed: data.user.email_confirmed_at !== null,

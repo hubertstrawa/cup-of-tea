@@ -50,7 +50,6 @@ export const EventsProvider: React.FC<{ children: ReactNode }> = ({ children }) 
           throw new Error("Failed to fetch events");
         }
         const data = await response.json();
-        console.log("data", data);
 
         // Ensure proper mapping from backend structure to CalendarEvent
         const mappedEvents: CalendarEvent[] = (data?.data || []).map((event: any) => ({
@@ -63,7 +62,6 @@ export const EventsProvider: React.FC<{ children: ReactNode }> = ({ children }) 
           backgroundColor: event.backgroundColor ?? event.color ?? "#76c7ef",
         }));
         setEvents(mappedEvents);
-        console.log("mappedEvents", mappedEvents);
       } catch (error) {
         console.error("Error fetching events:", error);
       }

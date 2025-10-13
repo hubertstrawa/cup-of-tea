@@ -54,7 +54,7 @@ export const onRequest = defineMiddleware(async ({ locals, cookies, url, request
       const authUser: AuthUser = {
         id: userProfile.id,
         email: user.email || "",
-        role: userProfile.role === "lektor" ? "teacher" : "student",
+        role: userProfile.role === "tutor" ? "tutor" : "student",
         firstName: userProfile.first_name,
         lastName: userProfile.last_name,
         emailConfirmed: user.email_confirmed_at !== null,

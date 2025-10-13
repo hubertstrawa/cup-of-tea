@@ -26,7 +26,7 @@ Endpoint korzysta z walidacji danych, autoryzacji oraz logowania błędów, a ta
   {
     "start_time": "timestamp",
     "end_time": "timestamp",
-    "status": "dostępny",
+    "status": "available",
     "additional_info": {}
   }
   ```

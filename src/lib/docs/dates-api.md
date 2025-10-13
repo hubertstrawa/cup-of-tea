@@ -13,7 +13,7 @@ Retrieve a paginated list of dates with optional filters.
 - `limit` (optional): Items per page (default: 10, min: 1, max: 100)
 - `teacherId` (optional): Filter by teacher UUID
 - `date` (optional): Filter by specific date (YYYY-MM-DD format)
-- `status` (optional): Filter by status ("dostępny", "zarezerwowany", "anulowany")
+- `status` (optional): Filter by status ("available", "booked", "canceled")
 
 **Response (200):**
 ```json
@@ -23,7 +23,7 @@ Retrieve a paginated list of dates with optional filters.
       "id": "uuid",
       "start_time": "2024-01-15T10:00:00.000Z",
       "end_time": "2024-01-15T11:00:00.000Z",
-      "status": "dostępny",
+      "status": "available",
       "teacher_id": "uuid"
     }
   ],
@@ -43,7 +43,7 @@ Create a new date entry.
 {
   "start_time": "2024-01-17T10:00:00.000Z",
   "end_time": "2024-01-17T11:00:00.000Z",
-  "status": "dostępny",
+  "status": "available",
   "additional_info": {
     "notes": "Regular lesson slot"
   }
@@ -69,7 +69,7 @@ Update an existing date entry.
 {
   "start_time": "2024-01-17T11:00:00.000Z",
   "end_time": "2024-01-17T12:00:00.000Z",
-  "status": "dostępny"
+  "status": "available"
 }
 ```
 
@@ -166,7 +166,7 @@ Mock data and test utilities are available in:
 
 ### Fetch available dates for a specific teacher on a date
 ```
-GET /api/dates?teacherId=uuid&date=2024-01-15&status=dostępny&page=1&limit=10
+GET /api/dates?teacherId=uuid&date=2024-01-15&status=available&page=1&limit=10
 ```
 
 ### Create a new availability slot
@@ -177,7 +177,7 @@ Content-Type: application/json
 {
   "start_time": "2024-01-20T14:00:00.000Z",
   "end_time": "2024-01-20T15:00:00.000Z",
-  "status": "dostępny"
+  "status": "available"
 }
 ```
 

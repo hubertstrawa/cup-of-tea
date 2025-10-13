@@ -69,7 +69,7 @@ export class DatesService {
       .from("dates")
       .select("id")
       .eq("teacher_id", teacherId)
-      .neq("status", "anulowany")
+      .neq("status", "canceled")
       .or(
         `and(start_time.lt.${command.start_time},end_time.gt.${command.start_time}),and(start_time.lt.${command.end_time},end_time.gt.${command.end_time}),and(start_time.gte.${command.start_time},end_time.lte.${command.end_time})`
       );
@@ -141,7 +141,7 @@ export class DatesService {
         .select("id")
         .eq("teacher_id", userId)
         .neq("id", id)
-        .neq("status", "anulowany")
+        .neq("status", "canceled")
         .or(
           `and(start_time.lt.${newStartTime},end_time.gt.${newStartTime}),and(start_time.lt.${newEndTime},end_time.gt.${newEndTime}),and(start_time.gte.${newStartTime},end_time.lte.${newEndTime})`
         );
@@ -189,7 +189,7 @@ export class DatesService {
       .from("reservations")
       .select("id")
       .eq("term_id", id)
-      .eq("status", "potwierdzona");
+      .eq("status", "confirmed");
 
     if (reservationCheck.error) {
       throw new Error(`Failed to check reservations: ${reservationCheck.error.message}`);

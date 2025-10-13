@@ -12,23 +12,26 @@ export const mockDates: DateListItemDTO[] = [
   {
     id: "550e8400-e29b-41d4-a716-446655440001",
     start_time: "2024-01-15T10:00:00.000Z",
+    student_id: null,
     end_time: "2024-01-15T11:00:00.000Z",
-    status: "dostępny",
+    status: "available",
     teacher_id: DEFAULT_USER_ID,
   },
   {
     id: "550e8400-e29b-41d4-a716-446655440002",
     start_time: "2024-01-15T14:00:00.000Z",
     end_time: "2024-01-15T15:00:00.000Z",
-    status: "zarezerwowany",
+    status: "booked",
     teacher_id: DEFAULT_USER_ID,
+    student_id: null,
   },
   {
     id: "550e8400-e29b-41d4-a716-446655440003",
     start_time: "2024-01-16T09:00:00.000Z",
     end_time: "2024-01-16T10:00:00.000Z",
-    status: "dostępny",
+    status: "available",
     teacher_id: DEFAULT_USER_ID,
+    student_id: null,
   },
 ];
 
@@ -62,7 +65,7 @@ export const mockDeleteDateResponse: DeleteEntityResponseDTO = {
 export const mockCreateDateRequest = {
   start_time: "2024-01-17T10:00:00.000Z",
   end_time: "2024-01-17T11:00:00.000Z",
-  status: "dostępny" as const,
+  status: "available",
   additional_info: {
     notes: "Regular lesson slot",
   },
@@ -71,7 +74,7 @@ export const mockCreateDateRequest = {
 export const mockUpdateDateRequest = {
   start_time: "2024-01-17T11:00:00.000Z",
   end_time: "2024-01-17T12:00:00.000Z",
-  status: "dostępny" as const,
+  status: "available",
 };
 
 // Mock query parameters
@@ -80,7 +83,7 @@ export const mockQueryParams = {
   limit: 10,
   teacherId: DEFAULT_USER_ID,
   date: "2024-01-15",
-  status: "dostępny" as const,
+  status: "available",
 };
 
 // Mock error responses

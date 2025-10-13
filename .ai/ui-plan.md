@@ -49,7 +49,7 @@ Interfejs użytkownika dla Cup of Tea jest zaprojektowany z myślą o jasnym pod
 ### Widok profilu użytkownika
 - **Nazwa widoku:** Profil użytkownika
 - **Ścieżka widoku:** /dashboard/profile
-- **Główny cel:** Prezentacja statystyk użytkownika (nawet lektora lub ucznia) oraz zarządzanie ustawieniami profilu.
+- **Główny cel:** Prezentacja statystyk użytkownika (lektora lub ucznia) oraz zarządzanie ustawieniami profilu.
 - **Kluczowe informacje do wyświetlenia:** Statystyki (odbyte lekcje, rezerwacje), dane osobowe, opcje zarządzania kontem, powiadomienia.
 - **Kluczowe komponenty widoku:** Karty statystyk, formularze edycji profilu, lista powiadomień, komponenty wizualizujące dane (np. wykresy).
 - **UX, dostępność i względy bezpieczeństwa:** Priorytet dla zabezpieczenia danych, responsywność, wysoka czytelność informacji.

@@ -3,7 +3,7 @@ import { z } from "zod";
 // Base schemas for date/time validation
 const timestampSchema = z.string().datetime({ message: "Invalid timestamp format" });
 const uuidSchema = z.string().uuid({ message: "Invalid UUID format" });
-const dateStatusSchema = z.enum(["dostępny", "zarezerwowany", "anulowany"] as const);
+const dateStatusSchema = z.enum(["available", "booked", "canceled"] as const);
 
 // Pagination schemas
 export const paginationParamsSchema = z.object({
@@ -28,7 +28,7 @@ export const createDateSchema = z
     description: z.string().optional(),
     start_time: timestampSchema,
     end_time: timestampSchema,
-    status: dateStatusSchema.default("dostępny"),
+    status: dateStatusSchema.default("available"),
     additional_info: z.record(z.any()).optional(),
   })
   .refine((data) => new Date(data.end_time) > new Date(data.start_time), {

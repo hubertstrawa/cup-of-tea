@@ -12,7 +12,7 @@ export const RegisterSchema = z
     confirmPassword: z.string(),
     firstName: z.string().min(2, { message: "Imię musi mieć co najmniej 2 znaki." }),
     lastName: z.string().min(2, { message: "Nazwisko musi mieć co najmniej 2 znaki." }),
-    role: z.enum(["teacher", "student"], { message: "Wybierz rolę." }),
+    role: z.enum(["tutor", "student"], { message: "Wybierz rolę." }),
     teacherId: z.string().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {

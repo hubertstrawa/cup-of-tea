@@ -42,7 +42,7 @@ describe("DatesService", () => {
         limit: 10,
         teacherId: DEFAULT_USER_ID,
         date: "2024-01-15",
-        status: "dostępny" as const,
+        status: "available" as const,
       };
 
       const result = await datesService.getDates(query);
