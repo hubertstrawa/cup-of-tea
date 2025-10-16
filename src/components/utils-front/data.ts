@@ -69,6 +69,7 @@ export interface CalendarEvent {
   title: string;
   start: Date;
   end: Date;
+  dateStatus: string;
   backgroundColor?: string;
   description: string;
 }
@@ -80,6 +81,7 @@ export const initialEvents: CalendarEvent[] = [
     start: new Date("2025-10-12 10:00:00+02:00"),
     end: new Date("2025-10-12 14:00:00+02:00"),
     backgroundColor: "#AEC6E4",
+    dateStatus: "available",
     description: "This is a daily meeting to go over today's tasks.",
   },
   {
@@ -89,6 +91,7 @@ export const initialEvents: CalendarEvent[] = [
     end: new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 1, 17, 30),
     backgroundColor: "#FFD1DC",
     description: "Lunch at Cracker Barrel with integration clients.",
+    dateStatus: "available",
   },
   {
     id: "3",
@@ -97,6 +100,7 @@ export const initialEvents: CalendarEvent[] = [
     end: new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), 18, 45),
     backgroundColor: "#B2E0B2",
     description: "Conversation with counselor about progression.",
+    dateStatus: "available",
   },
   {
     id: "4",
@@ -105,6 +109,7 @@ export const initialEvents: CalendarEvent[] = [
     end: new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 3, 18, 45),
     backgroundColor: "#FFB3BA",
     description: "Team bonding and strategic planning.",
+    dateStatus: "available",
   },
   {
     id: "5",
@@ -113,10 +118,12 @@ export const initialEvents: CalendarEvent[] = [
     end: new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 5, 15, 30),
     backgroundColor: "#FFDFBA",
     description: "Improve your productivity with effective time management techniques.",
+    dateStatus: "available",
   },
   {
     id: "6",
     title: "Health and Wellness Fair",
+    dateStatus: "available",
     start: new Date(
       currentDate.getFullYear(),
       currentDate.getMonth(),
@@ -137,6 +144,7 @@ export const initialEvents: CalendarEvent[] = [
   {
     id: "7",
     title: "Book Club Discussion",
+    dateStatus: "available",
     start: new Date(
       currentDate.getFullYear(),
       currentDate.getMonth(),
@@ -157,6 +165,7 @@ export const initialEvents: CalendarEvent[] = [
   {
     id: "8",
     title: "Creative Writing Workshop",
+    dateStatus: "available",
     start: new Date(
       currentDate.getFullYear(),
       currentDate.getMonth(),
@@ -177,6 +186,7 @@ export const initialEvents: CalendarEvent[] = [
   {
     id: "9",
     title: "Charity Fundraiser",
+    dateStatus: "available",
     start: new Date(
       currentDate.getFullYear(),
       currentDate.getMonth(),

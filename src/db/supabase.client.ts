@@ -14,7 +14,7 @@ export const supabaseClient = createClient<Database>(supabaseUrl, supabaseAnonKe
 // SSR-compatible Supabase client (dla Astro server-side)
 export const cookieOptions: CookieOptionsWithName = {
   path: "/",
-  secure: true,
+  secure: import.meta.env.PROD, // Only secure in production
   httpOnly: true,
   sameSite: "lax",
 };

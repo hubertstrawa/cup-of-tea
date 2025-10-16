@@ -10,6 +10,7 @@ import type {
   UUID,
 } from "../../types2";
 import type { DatesListQuery } from "../validation/dates.schemas";
+import { normalizeDateToMinutes } from "../utils";
 
 export class DatesService {
   constructor(private supabase: SupabaseClient) {}
@@ -64,6 +65,10 @@ export class DatesService {
    * Create a new date entry
    */
   async createDate(command: CreateDateCommand, teacherId: UUID): Promise<CreateEntityResponseDTO> {
+    // Normalize dates to ensure seconds and milliseconds are 0
+    const normalizedStartTime = normalizeDateToMinutes(new Date(command.start_time)).toISOString();
+    const normalizedEndTime = normalizeDateToMinutes(new Date(command.end_time)).toISOString();
+
     // Check for time conflicts with existing dates for the same teacher
     const conflictCheck = await this.supabase
       .from("dates")
@@ -71,7 +76,7 @@ export class DatesService {
       .eq("teacher_id", teacherId)
       .neq("status", "canceled")
       .or(
-        `and(start_time.lt.${command.start_time},end_time.gt.${command.start_time}),and(start_time.lt.${command.end_time},end_time.gt.${command.end_time}),and(start_time.gte.${command.start_time},end_time.lte.${command.end_time})`
+        `and(start_time.lt.${normalizedStartTime},end_time.gt.${normalizedStartTime}),and(start_time.lt.${normalizedEndTime},end_time.gt.${normalizedEndTime}),and(start_time.gte.${normalizedStartTime},end_time.lte.${normalizedEndTime})`
       );
 
     if (conflictCheck.error) {
@@ -86,6 +91,8 @@ export class DatesService {
       .from("dates")
       .insert({
         ...command,
+        start_time: normalizedStartTime,
+        end_time: normalizedEndTime,
         teacher_id: teacherId,
         student_id: null,
       })
@@ -133,8 +140,13 @@ export class DatesService {
         throw new Error(`Failed to fetch current date: ${fetchError.message}`);
       }
 
-      const newStartTime = command.start_time || currentDate.start_time;
-      const newEndTime = command.end_time || currentDate.end_time;
+      // Normalize new times if provided, otherwise use current times
+      const newStartTime = command.start_time
+        ? normalizeDateToMinutes(new Date(command.start_time)).toISOString()
+        : currentDate.start_time;
+      const newEndTime = command.end_time
+        ? normalizeDateToMinutes(new Date(command.end_time)).toISOString()
+        : currentDate.end_time;
 
       const conflictCheck = await this.supabase
         .from("dates")
@@ -153,12 +165,26 @@ export class DatesService {
       if (conflictCheck.data && conflictCheck.data.length > 0) {
         throw new Error("Updated time slot conflicts with existing date", { cause: "CONFLICT" });
       }
-    }
 
-    const { error } = await this.supabase.from("dates").update(command).eq("id", id);
+      // Update command with normalized times
+      const normalizedCommand = {
+        ...command,
+        ...(command.start_time && { start_time: newStartTime }),
+        ...(command.end_time && { end_time: newEndTime }),
+      };
 
-    if (error) {
-      throw new Error(`Failed to update date: ${error.message}`);
+      const { error: updateError } = await this.supabase.from("dates").update(normalizedCommand).eq("id", id);
+
+      if (updateError) {
+        throw new Error(`Failed to update date: ${updateError.message}`);
+      }
+    } else {
+      // No time updates, proceed with original command
+      const { error: updateError } = await this.supabase.from("dates").update(command).eq("id", id);
+
+      if (updateError) {
+        throw new Error(`Failed to update date: ${updateError.message}`);
+      }
     }
 
     return {

@@ -54,7 +54,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
         data: {
           first_name: firstName,
           last_name: lastName,
-          role: role === "tutor" ? "tutor" : "student",
+          role: role,
           teacher_id: teacherId || null,
         },
       },
@@ -69,10 +69,53 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       return createErrorResponse(AUTH_ERRORS.INTERNAL_ERROR, "Nie udało się utworzyć konta");
     }
 
+    // TYMCZASOWO WYŁĄCZONE AUTOMATYCZNE LOGOWANIE - powoduje pętlę przekierowań
+    // Sprawdź czy jesteśmy w środowisku dev lub czy email confirmation jest wyłączone
+    // const isDevelopment = import.meta.env.NODE_ENV === "development" || import.meta.env.NODE_ENV === "dev";
+    // const skipEmailConfirmation = import.meta.env.SKIP_EMAIL_CONFIRMATION === "true";
+    // const shouldAutoLogin = isDevelopment || skipEmailConfirmation;
+
+    const shouldAutoLogin = false; // Tymczasowo wyłączone
+    let signInError: any = null;
+
     // Profil użytkownika zostanie utworzony automatycznie przez trigger w bazie danych
     // ale sprawdzimy czy się udało
     const { data: userProfile } = await supabase.from("users").select("*").eq("id", data.user.id).single();
 
+    // Jeśli użytkownik ma rolę tutor, dodaj go do tabeli teachers
+    if (role === "tutor") {
+      const { error: teacherError } = await supabase.from("teachers").insert({
+        teacher_id: data.user.id,
+        bio: null,
+        description: null,
+        lessons_completed: 0,
+        lessons_planned: 0,
+      });
+
+      if (teacherError) {
+        console.error("Error creating teacher profile:", teacherError);
+        // Nie przerywamy procesu rejestracji, ale logujemy błąd
+      }
+    }
+
+    // Jeśli użytkownik ma rolę student i podał teacherId, dodaj relację
+    if (role === "student" && teacherId) {
+      const { error: relationError } = await supabase.from("teacher_students").insert({
+        teacher_id: teacherId,
+        student_id: data.user.id,
+        lessons_completed: 0,
+        lessons_reserved: 0,
+      });
+
+      if (relationError) {
+        console.error("Error creating teacher-student relation:", relationError);
+        // Nie przerywamy procesu rejestracji, ale logujemy błąd
+      }
+    }
+
+    // Sprawdź czy automatyczne logowanie się udało
+    const isAutoLoggedIn = shouldAutoLogin && !signInError;
+    
     return createSuccessResponse(
       {
         user: {
@@ -81,10 +124,10 @@ export const POST: APIRoute = async ({ request, cookies }) => {
           role: role,
           firstName: firstName,
           lastName: lastName,
-          emailConfirmed: false, // Nowy użytkownik musi potwierdzić email
+          emailConfirmed: data.user.email_confirmed_at !== null,
         },
-        message: "Konto zostało utworzone. Sprawdź swoją skrzynkę e-mail i potwierdź adres.",
-        requiresEmailConfirmation: true,
+        message: "Konto zostało utworzone pomyślnie. Możesz się teraz zalogować.",
+        requiresEmailConfirmation: false, // Tymczasowo wyłączone dla dev
       },
       201
     );

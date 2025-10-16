@@ -1,0 +1,267 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { createSupabaseServerInstance } from "../../db/supabase.client.ts";
+
+export const prerender = false;
+
+// Pobranie ID terminu z parametrów URL
+const { id: dateId } = Astro.params;
+
+if (!dateId) {
+  return Astro.redirect("/404");
+}
+
+// Utworzenie instancji Supabase
+const supabase = createSupabaseServerInstance({
+  cookies: Astro.cookies,
+  headers: Astro.request.headers,
+});
+
+// Sprawdzenie czy użytkownik jest zalogowany
+const { data: { session } } = await supabase.auth.getSession();
+
+if (!session) {
+  // Przekieruj do logowania z informacją o powrocie
+  const redirectUrl = `/booking/${dateId}`;
+  return Astro.redirect(`/login?redirect=${encodeURIComponent(redirectUrl)}`);
+}
+
+// Pobranie danych terminu
+const { data: dateSlot, error: dateError } = await supabase
+  .from("dates")
+  .select(`
+    id,
+    start_time,
+    end_time,
+    title,
+    description,
+    additional_info,
+    teacher_id,
+    users!dates_teacher_id_fkey (
+      id,
+      first_name,
+      last_name,
+      teachers (
+        bio,
+        description
+      )
+    )
+  `)
+  .eq("id", dateId)
+  .eq("status", "available")
+  .single();
+
+if (dateError || !dateSlot) {
+  return Astro.redirect("/404");
+}
+
+// Pobranie informacji o użytkowniku
+const { data: { user } } = await supabase.auth.getUser();
+const { data: userProfile } = await supabase
+  .from("users")
+  .select("*")
+  .eq("id", user?.id)
+  .single();
+
+// Sprawdzenie czy to pierwsza lekcja z tym nauczycielem
+const { data: existingLessons } = await supabase
+  .from("teacher_students")
+  .select("lessons_completed")
+  .eq("teacher_id", dateSlot.teacher_id)
+  .eq("student_id", user?.id)
+  .single();
+
+const isFirstLesson = !existingLessons || existingLessons.lessons_completed === 0;
+
+const teacher = dateSlot.users;
+const startTime = new Date(dateSlot.start_time);
+const endTime = new Date(dateSlot.end_time);
+---
+
+<Layout title="Rezerwacja terminu - Cup of Tea">
+  <main class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Header -->
+      <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Rezerwacja terminu</h1>
+        <p class="text-gray-600">Potwierdź szczegóły swojej lekcji</p>
+      </div>
+
+      <!-- Informacje o terminie -->
+      <div class="bg-white rounded-lg shadow-sm mb-6">
+        <div class="p-6">
+          <h2 class="text-xl font-semibold text-gray-900 mb-4">Szczegóły terminu</h2>
+          
+          <div class="space-y-4">
+            <div class="flex justify-between items-center py-2 border-b border-gray-100">
+              <span class="font-medium text-gray-700">Nauczyciel:</span>
+              <span class="text-gray-900">{teacher.first_name} {teacher.last_name}</span>
+            </div>
+            
+            <div class="flex justify-between items-center py-2 border-b border-gray-100">
+              <span class="font-medium text-gray-700">Data:</span>
+              <span class="text-gray-900">
+                {startTime.toLocaleDateString("pl-PL", {
+                  weekday: "long",
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric"
+                })}
+              </span>
+            </div>
+            
+            <div class="flex justify-between items-center py-2 border-b border-gray-100">
+              <span class="font-medium text-gray-700">Godzina:</span>
+              <span class="text-gray-900">
+                {startTime.toLocaleTimeString("pl-PL", {
+                  hour: "2-digit",
+                  minute: "2-digit"
+                })} - {endTime.toLocaleTimeString("pl-PL", {
+                  hour: "2-digit",
+                  minute: "2-digit"
+                })}
+              </span>
+            </div>
+            
+            <div class="flex justify-between items-center py-2">
+              <span class="font-medium text-gray-700">Czas trwania:</span>
+              <span class="text-gray-900">
+                {Math.round((endTime.getTime() - startTime.getTime()) / (1000 * 60))} minut
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Formularz rezerwacji -->
+      <div class="bg-white rounded-lg shadow-sm">
+        <div class="p-6">
+          <h2 class="text-xl font-semibold text-gray-900 mb-4">Informacje o lekcji</h2>
+          
+          {isFirstLesson && (
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+              <div class="flex items-center">
+                <svg class="h-5 w-5 text-blue-400 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                </svg>
+                <p class="text-sm text-blue-700">
+                  <strong>To będzie Twoja pierwsza lekcja z tym nauczycielem!</strong>
+                </p>
+              </div>
+            </div>
+          )}
+          
+          <form id="booking-form" class="space-y-6">
+            <input type="hidden" name="dateId" value={dateId} />
+            <input type="hidden" name="teacherId" value={dateSlot.teacher_id} />
+            <input type="hidden" name="isFirstLesson" value={isFirstLesson.toString()} />
+            
+            <div>
+              <label for="notes" class="block text-sm font-medium text-gray-700 mb-2">
+                Notatki do lekcji (opcjonalne)
+              </label>
+              <textarea
+                id="notes"
+                name="notes"
+                rows="4"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Opisz swoje cele na tę lekcję, tematy które chciałbyś omówić, lub inne uwagi..."
+              ></textarea>
+            </div>
+            
+            {isFirstLesson && (
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  Poziom znajomości języka
+                </label>
+                <select
+                  name="languageLevel"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  required
+                >
+                  <option value="">Wybierz poziom</option>
+                  <option value="beginner">Początkujący (A1-A2)</option>
+                  <option value="intermediate">Średniozaawansowany (B1-B2)</option>
+                  <option value="advanced">Zaawansowany (C1-C2)</option>
+                </select>
+              </div>
+            )}
+            
+            <div class="flex items-center">
+              <input
+                id="terms"
+                name="terms"
+                type="checkbox"
+                required
+                class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              />
+              <label for="terms" class="ml-2 block text-sm text-gray-700">
+                Akceptuję <a href="/terms" class="text-blue-600 hover:text-blue-800 underline">regulamin</a> 
+                i <a href="/privacy" class="text-blue-600 hover:text-blue-800 underline">politykę prywatności</a>
+              </label>
+            </div>
+            
+            <div class="flex space-x-4">
+              <button
+                type="button"
+                onclick="history.back()"
+                class="flex-1 px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                Anuluj
+              </button>
+              <button
+                type="submit"
+                class="flex-1 px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                Potwierdź rezerwację
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    document.getElementById('booking-form')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const form = e.target as HTMLFormElement;
+      const formData = new FormData(form);
+      const submitButton = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+      
+      // Disable submit button
+      submitButton.disabled = true;
+      submitButton.textContent = 'Rezerwuję...';
+      
+      try {
+        const response = await fetch('/api/bookings', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            dateId: formData.get('dateId'),
+            teacherId: formData.get('teacherId'),
+            notes: formData.get('notes'),
+            isFirstLesson: formData.get('isFirstLesson') === 'true',
+            languageLevel: formData.get('languageLevel'),
+          }),
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok && result.success) {
+          // Redirect to success page
+          window.location.href = `/booking/success/${result.data.reservationId}`;
+        } else {
+          throw new Error(result.error || 'Wystąpił błąd podczas rezerwacji');
+        }
+      } catch (error) {
+        alert(`Błąd: ${error.message}`);
+        submitButton.disabled = false;
+        submitButton.textContent = 'Potwierdź rezerwację';
+      }
+    });
+  </script>
+</Layout>

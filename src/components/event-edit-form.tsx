@@ -1,4 +1,3 @@
-"use client";
 
 import React, { useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -26,6 +25,7 @@ import { ToastAction } from "./ui/toast";
 import type { CalendarEvent } from "@/components/utils-front/data";
 import { Button } from "./ui/button";
 import { Pencil2Icon } from "@radix-ui/react-icons";
+import { normalizeDateToMinutes } from "@/lib/utils";
 
 const eventEditFormSchema = z.object({
   id: z.string(),
@@ -77,6 +77,7 @@ export function EventEditForm({ oldEvent, event, isDrag, displayButton, closeEve
         start: oldEvent.start,
         end: oldEvent.end,
         color: oldEvent.backgroundColor || "#76c7ef",
+        dateStatus: oldEvent.dateStatus,
       };
 
       deleteEvent(oldEvent.id);
@@ -93,17 +94,24 @@ export function EventEditForm({ oldEvent, event, isDrag, displayButton, closeEve
       start: event?.start as Date,
       end: event?.end as Date,
       color: event?.backgroundColor,
+      dateStatus: event?.dateStatus,
     });
   }, [form, event]);
 
   async function onSubmit(data: EventEditFormValues) {
+    // Normalize dates to ensure seconds and milliseconds are 0
+    const normalizedStart = normalizeDateToMinutes(data.start);
+    const normalizedEnd = normalizeDateToMinutes(data.end);
+    console.log("data", data);
+
     const newEvent = {
       id: data.id,
       title: data.title,
       description: data.description,
-      start: data.start,
-      end: data.end,
+      start: normalizedStart,
+      end: normalizedEnd,
       color: data.color,
+      dateStatus: data.dateStatus,
     };
 
     try {
@@ -114,8 +122,8 @@ export function EventEditForm({ oldEvent, event, isDrag, displayButton, closeEve
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          start_time: data.start.toISOString(),
-          end_time: data.end.toISOString(),
+          start_time: normalizedStart.toISOString(),
+          end_time: normalizedEnd.toISOString(),
         }),
       });
 

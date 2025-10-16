@@ -1,0 +1,179 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import { createSupabaseServerInstance } from "../../../db/supabase.client.ts";
+
+export const prerender = false;
+
+// Pobranie ID rezerwacji z parametrów URL
+const { id: reservationId } = Astro.params;
+
+if (!reservationId) {
+  return Astro.redirect("/404");
+}
+
+// Utworzenie instancji Supabase
+const supabase = createSupabaseServerInstance({
+  cookies: Astro.cookies,
+  headers: Astro.request.headers,
+});
+
+// Sprawdzenie czy użytkownik jest zalogowany
+const { data: { session } } = await supabase.auth.getSession();
+
+if (!session) {
+  return Astro.redirect("/login");
+}
+
+// Pobranie danych rezerwacji
+const { data: reservation, error: reservationError } = await supabase
+  .from("reservations")
+  .select(`
+    id,
+    notes,
+    reserved_at,
+    status,
+    dates!reservations_term_id_fkey (
+      id,
+      start_time,
+      end_time,
+      title,
+      description,
+      users!dates_teacher_id_fkey (
+        id,
+        first_name,
+        last_name
+      )
+    )
+  `)
+  .eq("id", reservationId)
+  .eq("student_id", session.user.id)
+  .single();
+
+if (reservationError || !reservation) {
+  return Astro.redirect("/404");
+}
+
+const dateSlot = reservation.dates;
+const teacher = dateSlot.users;
+const startTime = new Date(dateSlot.start_time);
+const endTime = new Date(dateSlot.end_time);
+---
+
+<Layout title="Rezerwacja potwierdzona - Cup of Tea">
+  <main class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Success Header -->
+      <div class="text-center mb-8">
+        <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
+          <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+        </div>
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Rezerwacja potwierdzona!</h1>
+        <p class="text-gray-600">Twoja lekcja została pomyślnie zarezerwowana</p>
+      </div>
+
+      <!-- Szczegóły rezerwacji -->
+      <div class="bg-white rounded-lg shadow-sm mb-6">
+        <div class="p-6">
+          <h2 class="text-xl font-semibold text-gray-900 mb-4">Szczegóły lekcji</h2>
+          
+          <div class="space-y-4">
+            <div class="flex justify-between items-center py-2 border-b border-gray-100">
+              <span class="font-medium text-gray-700">Nauczyciel:</span>
+              <span class="text-gray-900">{teacher.first_name} {teacher.last_name}</span>
+            </div>
+            
+            <div class="flex justify-between items-center py-2 border-b border-gray-100">
+              <span class="font-medium text-gray-700">Data:</span>
+              <span class="text-gray-900">
+                {startTime.toLocaleDateString("pl-PL", {
+                  weekday: "long",
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric"
+                })}
+              </span>
+            </div>
+            
+            <div class="flex justify-between items-center py-2 border-b border-gray-100">
+              <span class="font-medium text-gray-700">Godzina:</span>
+              <span class="text-gray-900">
+                {startTime.toLocaleTimeString("pl-PL", {
+                  hour: "2-digit",
+                  minute: "2-digit"
+                })} - {endTime.toLocaleTimeString("pl-PL", {
+                  hour: "2-digit",
+                  minute: "2-digit"
+                })}
+              </span>
+            </div>
+            
+            <div class="flex justify-between items-center py-2 border-b border-gray-100">
+              <span class="font-medium text-gray-700">Status:</span>
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                Potwierdzona
+              </span>
+            </div>
+            
+            {reservation.notes && (
+              <div class="py-2">
+                <span class="font-medium text-gray-700 block mb-2">Notatki:</span>
+                <p class="text-gray-900 text-sm bg-gray-50 p-3 rounded-md">{reservation.notes}</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <!-- Następne kroki -->
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
+        <h3 class="text-lg font-semibold text-blue-900 mb-3">Co dalej?</h3>
+        <ul class="space-y-2 text-sm text-blue-800">
+          <li class="flex items-start">
+            <svg class="h-4 w-4 text-blue-600 mt-0.5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+            </svg>
+            Otrzymasz przypomnienie e-mailem 24 godziny przed lekcją
+          </li>
+          <li class="flex items-start">
+            <svg class="h-4 w-4 text-blue-600 mt-0.5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+            </svg>
+            Nauczyciel skontaktuje się z Tobą przed lekcją z linkiem do spotkania
+          </li>
+          <li class="flex items-start">
+            <svg class="h-4 w-4 text-blue-600 mt-0.5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+            </svg>
+            Możesz anulować lekcję do 24 godzin przed terminem
+          </li>
+        </ul>
+      </div>
+
+      <!-- Akcje -->
+      <div class="flex flex-col sm:flex-row gap-4">
+        <a
+          href="/dashboard"
+          class="flex-1 bg-blue-600 text-white text-center py-3 px-4 rounded-md hover:bg-blue-700 transition-colors font-medium"
+        >
+          Przejdź do panelu
+        </a>
+        <a
+          href={`/tutor/${teacher.id}`}
+          class="flex-1 bg-white text-blue-600 border border-blue-600 text-center py-3 px-4 rounded-md hover:bg-blue-50 transition-colors font-medium"
+        >
+          Zarezerwuj kolejną lekcję
+        </a>
+      </div>
+
+      <!-- Informacje kontaktowe -->
+      <div class="mt-8 text-center text-sm text-gray-500">
+        <p>
+          Masz pytania? Skontaktuj się z nami: 
+          <a href="mailto:support@cupoftea.pl" class="text-blue-600 hover:text-blue-800">support@cupoftea.pl</a>
+        </p>
+      </div>
+    </div>
+  </main>
+</Layout>

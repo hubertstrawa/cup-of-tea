@@ -1,5 +1,3 @@
-"use client";
-
 import { useEvents } from "@/components/context/events-context";
 import "@/styles/calendar.css";
 import type {
@@ -57,6 +55,7 @@ export default function Calendar() {
       backgroundColor: info.event.backgroundColor,
       start: info.event.start!,
       end: info.event.end!,
+      dateStatus: info.event.extendedProps.dateStatus,
     };
 
     setIsDrag(false);
@@ -73,6 +72,7 @@ export default function Calendar() {
       backgroundColor: info.event.backgroundColor,
       start: info.event.start!,
       end: info.event.end!,
+      dateStatus: info.event.extendedProps.dateStatus,
     };
 
     const oldEvent: CalendarEvent = {
@@ -82,6 +82,7 @@ export default function Calendar() {
       backgroundColor: info.oldEvent.backgroundColor,
       start: info.oldEvent.start!,
       end: info.oldEvent.end!,
+      dateStatus: info.oldEvent.extendedProps.dateStatus,
     };
 
     setIsDrag(true);

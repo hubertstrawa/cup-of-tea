@@ -1,4 +1,3 @@
-"use client";
 
 import { cn } from "@/components/utils-front/utils";
 import { months } from "@/components/utils-front/data";
@@ -115,17 +114,19 @@ export default function CalendarNav({ calendarRef, start, end, viewedDate }: Cal
           </PopoverTrigger>
           <PopoverContent className="w-[200px] p-0">
             <Command>
-              {/* <CommandInput placeholder='Search month...' /> */}
+              <CommandInput placeholder="Szukaj miesiąca..." />
               <CommandList>
                 <CommandEmpty>No month found.</CommandEmpty>
                 <CommandGroup>
                   {months.map((month) => (
                     <CommandItem
                       key={month.value}
-                      value={month.value}
-                      onSelect={(currentValue) => {
-                        handleMonthChange(calendarRef, viewedDate, currentValue);
-                        //   setValue(currentValue === selectedMonth ? "" : currentValue);
+                      value={month.label} // Ustawiamy to na etykietę, dzięki czemu wyszukiwanie porównuje wpisany tekst z label
+                      onSelect={(selectedLabel) => {
+                        const selectedMonthObj = months.find((m) => m.label === selectedLabel);
+                        if (selectedMonthObj) {
+                          handleMonthChange(calendarRef, viewedDate, selectedMonthObj.value);
+                        }
                         setMonthSelectOpen(false);
                       }}
                     >
@@ -170,7 +171,7 @@ export default function CalendarNav({ calendarRef, start, end, viewedDate }: Cal
         {/* Button to go to current date */}
 
         <Button
-          className="w-[90px] text-xs md:text-sm"
+          className="text-xs md:text-sm"
           variant="outline"
           onClick={() => {
             goToday(calendarRef);
@@ -179,9 +180,9 @@ export default function CalendarNav({ calendarRef, start, end, viewedDate }: Cal
           {currentView === "timeGridDay"
             ? "Dzisiaj"
             : currentView === "timeGridWeek"
-              ? "This Week"
+              ? "Ten tydzień"
               : currentView === "dayGridMonth"
-                ? "This Month"
+                ? "Ten miesiąc"
                 : null}
         </Button>
 
@@ -195,7 +196,7 @@ export default function CalendarNav({ calendarRef, start, end, viewedDate }: Cal
               className={`space-x-1 ${currentView === "timeGridDay" ? "w-1/2" : "w-1/4"}`}
             >
               <GalleryVertical className="h-5 w-5" />
-              {currentView === "timeGridDay" && <p className="text-xs md:text-sm">Day</p>}
+              {currentView === "timeGridDay" && <p className="text-xs md:text-sm">Dzień</p>}
             </TabsTrigger>
             <TabsTrigger
               value="timeGridWeek"
@@ -203,7 +204,7 @@ export default function CalendarNav({ calendarRef, start, end, viewedDate }: Cal
               className={`space-x-1 ${currentView === "timeGridWeek" ? "w-1/2" : "w-1/4"}`}
             >
               <Tally3 className="h-5 w-5" />
-              {currentView === "timeGridWeek" && <p className="text-xs md:text-sm">Week</p>}
+              {currentView === "timeGridWeek" && <p className="text-xs md:text-sm">Tydzień</p>}
             </TabsTrigger>
             <TabsTrigger
               value="dayGridMonth"
@@ -211,7 +212,7 @@ export default function CalendarNav({ calendarRef, start, end, viewedDate }: Cal
               className={`space-x-1 ${currentView === "dayGridMonth" ? "w-1/2" : "w-1/4"}`}
             >
               <Table className="h-5 w-5 rotate-90" />
-              {currentView === "dayGridMonth" && <p className="text-xs md:text-sm">Month</p>}
+              {currentView === "dayGridMonth" && <p className="text-xs md:text-sm">Miesiąc</p>}
             </TabsTrigger>
           </TabsList>
         </Tabs>

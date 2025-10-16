@@ -1,0 +1,21 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { DashboardLayout } from "../../components/DashboardLayout";
+import { LessonsPage } from "../../components/LessonsPage";
+
+// Check if user is authenticated and is a tutor
+const user = Astro.locals.user;
+if (!user) {
+  return Astro.redirect("/login");
+}
+
+if (user.role !== "tutor") {
+  return Astro.redirect("/dashboard");
+}
+---
+
+<Layout title="Moje lekcje - Cup of Tea">
+  <DashboardLayout client:load user={user} activeView="lessons">
+    <LessonsPage client:load userId={user.id} />
+  </DashboardLayout>
+</Layout>

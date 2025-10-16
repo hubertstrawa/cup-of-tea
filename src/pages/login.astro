@@ -23,10 +23,16 @@ if (user) {
 // Sprawdzenie czy jest komunikat z URL (np. po rejestracji)
 const url = new URL(Astro.request.url);
 const message = url.searchParams.get("message");
+const redirectUrl = url.searchParams.get("redirect");
 
 let displayMessage = "";
 if (message === "confirm-email") {
   displayMessage = "Sprawdź swoją skrzynkę e-mail i potwierdź adres przed zalogowaniem.";
+}
+
+// Jeśli jest redirect URL, pokaż informację
+if (redirectUrl) {
+  displayMessage = "Zaloguj się, aby kontynuować rezerwację.";
 }
 ---
 
@@ -46,7 +52,7 @@ if (message === "confirm-email") {
         )
       }
 
-      <AuthForm mode="login" client:load />
+      <AuthForm mode="login" redirectUrl={redirectUrl || undefined} client:load />
     </div>
   </main>
 </Layout>

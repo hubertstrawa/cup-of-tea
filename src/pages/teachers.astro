@@ -1,0 +1,105 @@
+---
+import Layout from "../layouts/Layout.astro";
+
+// Pobranie danych użytkownika z middleware
+const user = Astro.locals.user;
+
+if (!user) {
+  return Astro.redirect("/login");
+}
+---
+
+<Layout title="Lektorzy - Cup of Tea">
+  <div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-4xl mx-auto px-4">
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Dostępni lektorzy</h1>
+        <p class="text-gray-600">Wybierz lektora i umów pierwszą lekcję</p>
+      </div>
+
+      <div id="teachers-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Teachers will be loaded here via JavaScript -->
+      </div>
+
+      <div id="loading" class="text-center py-8">
+        <div class="text-lg">Ładowanie lektorów...</div>
+      </div>
+
+      <div id="error" class="text-center py-8 hidden">
+        <div class="text-red-600">Błąd podczas ładowania lektorów</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function loadTeachers() {
+      try {
+        const response = await fetch('/api/teachers');
+        if (!response.ok) {
+          throw new Error('Failed to fetch teachers');
+        }
+        
+        const data = await response.json();
+        const teachers = data.data || [];
+        
+        const teachersContainer = document.getElementById('teachers-list');
+        const loadingElement = document.getElementById('loading');
+        const errorElement = document.getElementById('error');
+        
+        loadingElement?.classList.add('hidden');
+        
+        if (teachers.length === 0) {
+          teachersContainer!.innerHTML = `
+            <div class="col-span-full text-center py-8 text-gray-500">
+              <p>Brak dostępnych lektorów</p>
+            </div>
+          `;
+          return;
+        }
+        
+        teachersContainer!.innerHTML = teachers.map((teacher: any) => `
+          <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+            <div class="flex items-center space-x-4 mb-4">
+              <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                <span class="text-blue-600 font-semibold">
+                  ${teacher.first_name.charAt(0)}${teacher.last_name.charAt(0)}
+                </span>
+              </div>
+              <div>
+                <h3 class="text-lg font-semibold text-gray-900">
+                  ${teacher.first_name} ${teacher.last_name}
+                </h3>
+                <p class="text-sm text-gray-500">Lektor</p>
+              </div>
+            </div>
+            
+            ${teacher.teachers?.[0]?.bio ? `
+              <p class="text-gray-600 text-sm mb-4">${teacher.teachers[0].bio}</p>
+            ` : ''}
+            
+            ${teacher.teachers?.[0]?.description ? `
+              <p class="text-gray-600 text-sm mb-4">${teacher.teachers[0].description}</p>
+            ` : ''}
+            
+            <div class="flex justify-between items-center text-xs text-gray-500 mb-4">
+              <span>Doświadczenie: ${teacher.teachers?.[0]?.lessons_completed || 0} lekcji</span>
+            </div>
+            
+            <a href="/booking/${teacher.id}" 
+               class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors text-center block">
+              Umów lekcję
+            </a>
+          </div>
+        `).join('');
+        
+      } catch (error) {
+        console.error('Error loading teachers:', error);
+        document.getElementById('loading')?.classList.add('hidden');
+        document.getElementById('error')?.classList.remove('hidden');
+      }
+    }
+    
+    // Load teachers when page loads
+    loadTeachers();
+  </script>
+</Layout>

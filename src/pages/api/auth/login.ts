@@ -52,7 +52,9 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       .from("users")
       .select("*")
       .eq("id", data.user.id)
-      .single();
+      // .single();
+
+      console.log('userProfile', userProfile);
 
     if (profileError || !userProfile) {
       return createErrorResponse(AUTH_ERRORS.USER_NOT_FOUND);

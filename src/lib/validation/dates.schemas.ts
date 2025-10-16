@@ -3,7 +3,7 @@ import { z } from "zod";
 // Base schemas for date/time validation
 const timestampSchema = z.string().datetime({ message: "Invalid timestamp format" });
 const uuidSchema = z.string().uuid({ message: "Invalid UUID format" });
-const dateStatusSchema = z.enum(["available", "booked", "canceled"] as const);
+const dateStatusSchema = z.enum(["available", "booked", "canceled", 'other'] as const);
 
 // Pagination schemas
 export const paginationParamsSchema = z.object({

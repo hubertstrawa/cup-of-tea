@@ -18,6 +18,7 @@ interface EventViewProps {
 
 export function EventView({ event }: EventViewProps) {
   const { eventViewOpen, setEventViewOpen } = useEvents();
+  console.log(event);
 
   return (
     <>
@@ -32,19 +33,25 @@ export function EventView({ event }: EventViewProps) {
             </AlertDialogTitle>
             <table>
               <tr>
-                <th>Time:</th>
-                <td>{`${event?.start.toLocaleTimeString()} - ${event?.end.toLocaleTimeString()}`}</td>
+                <th>Godzina:</th>
+                <td>
+                  {`${event?.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${event?.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`}
+                </td>
               </tr>
               <tr>
-                <th>Description:</th>
+                <th>Opis:</th>
                 <td>{event?.description}</td>
               </tr>
               <tr>
+                <th>Status:</th>
+                <td>{event?.dateStatus}</td>
+              </tr>
+              {/* <tr>
                 <th>Color:</th>
                 <td>
                   <div className="rounded-full w-5 h-5" style={{ backgroundColor: event?.backgroundColor }}></div>
                 </td>
-              </tr>
+              </tr> */}
             </table>
           </AlertDialogHeader>
           <AlertDialogFooter>

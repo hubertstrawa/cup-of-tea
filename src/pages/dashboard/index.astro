@@ -2,13 +2,14 @@
 import Layout from "../../layouts/Layout.astro";
 import CalendarWrapper from "@/components/CalendarWrapper";
 import { DashboardLayout } from "@/components/DashboardLayout";
-
+import { StudentDashboard } from "@/components/StudentDashboard";
 // Pobranie danych użytkownika z middleware
 const user = Astro.locals.user;
 
 if (!user) {
   return Astro.redirect("/login");
 }
+console.log('user', user);
 
 const userProps = {
   firstName: user.firstName,
@@ -19,7 +20,11 @@ const userProps = {
 ---
 
 <Layout title="Dashboard - Cup of Tea">
-  <DashboardLayout user={userProps} activeView="calendar" client:load>
-    <CalendarWrapper client:load />
+  <DashboardLayout user={userProps} activeView={user.role === "tutor" ? "calendar" : "dashboard"} client:load>
+    {user.role === "tutor" ? (
+      <CalendarWrapper client:load />
+    ) : (
+      <StudentDashboard studentId={user.id} client:load />
+    )}
   </DashboardLayout>
 </Layout>

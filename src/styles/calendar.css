@@ -12,9 +12,21 @@
   .fc-scrollgrid {
     @apply !border-none;
   }
+
+  .fc-day .fc-day-today .fc-daygrid-day {
+    background-color: transparent !important;
+  }
   
   .fc tbody tr:last-child td:first-child {
     @apply !border-l-0;
+  }
+
+  .fc tbody tr:last-child td:first-child  .fc-day .fc-day-past .fc-day-other .fc-daygrid-day {
+    background-color: var(--color-gray-200, oklch(92.8% 0.006 264.531)) !important
+  }
+
+  .fc tbody tr:last-child td:first-child  .fc-day .fc-day-past .fc-day-other .fc-daygrid-day {
+    background-color: var(--color-gray-200, oklch(92.8% 0.006 264.531)) !important
   }
   
   .fc tbody tr:last-child td:last-child {
@@ -47,9 +59,9 @@
     @apply hover:bg-secondary;
   }
   
-  td.fc-daygrid-day.fc-day.fc-day-today {
+  /* td.fc-daygrid-day.fc-day.fc-day-today {
     @apply !bg-secondary-foreground;
-  }
+  } */
   
   .fc-day-today {
     @apply !bg-inherit;

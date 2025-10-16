@@ -1,4 +1,3 @@
-"use client";
 
 import React, { useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -25,6 +24,8 @@ import {
 import { DateTimePicker } from "./date-picker";
 import { useEvents } from "@/components/context/events-context";
 import { ToastAction } from "./ui/toast";
+import { normalizeDateToMinutes } from "@/lib/utils";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 
 const eventAddFormSchema = z.object({
   title: z
@@ -44,6 +45,7 @@ const eventAddFormSchema = z.object({
   color: z
     .string({ required_error: "Please select an event color." })
     .min(1, { message: "Must provide a title for this event." }),
+  status: z.enum(["available", "booked", "other"], { required_error: "Wybierz status wydarzenia." }),
 });
 
 type EventAddFormValues = z.infer<typeof eventAddFormSchema>;
@@ -70,17 +72,23 @@ export function EventAddForm({ start, end }: EventAddFormProps) {
       start: start,
       end: end,
       color: "#76c7ef",
+      status: "available",
     });
   }, [form, start, end]);
 
   async function onSubmit(data: EventAddFormValues) {
+    // Normalize dates to ensure seconds and milliseconds are 0
+    const normalizedStart = normalizeDateToMinutes(data.start);
+    const normalizedEnd = normalizeDateToMinutes(data.end);
+
     const newEvent = {
       id: String(events.length + 1),
       title: data.title,
       description: data.description,
-      start: data.start,
-      end: data.end,
+      start: normalizedStart,
+      end: normalizedEnd,
       color: data.color,
+      status: data.status,
     };
 
     try {
@@ -93,12 +101,11 @@ export function EventAddForm({ start, end }: EventAddFormProps) {
         body: JSON.stringify({
           title: data.title,
           description: data.description,
-          start_time: data.start,
-          end_time: data.end,
+          start_time: normalizedStart.toISOString(),
+          end_time: normalizedEnd.toISOString(),
+          status: data.status,
         }),
       });
-
-      console.log("response", response);
 
       if (!response.ok) {
         toast({
@@ -116,8 +123,7 @@ export function EventAddForm({ start, end }: EventAddFormProps) {
         title: "Event added!",
         action: <ToastAction altText={"Click here to dismiss notification"}>Dismiss</ToastAction>,
       });
-    } catch (error) {
-      console.error("Error adding event:", error);
+    } catch {
       toast({
         title: "Błąd!",
         description: "Wystąpił nieoczekiwany błąd.",
@@ -163,6 +169,33 @@ export function EventAddForm({ start, end }: EventAddFormProps) {
                   <FormLabel>Opis</FormLabel>
                   <FormControl>
                     <Textarea placeholder="Daily session" className="max-h-36" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField 
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Status</FormLabel>
+                  <FormControl>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormItem>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Wybierz status" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                      <SelectContent>
+                        <SelectItem value="available">Dostępny</SelectItem>
+                        <SelectItem value="booked">Zarezerwowany</SelectItem>
+                        <SelectItem value="other">Inny</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

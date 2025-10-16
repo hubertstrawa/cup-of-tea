@@ -27,6 +27,7 @@ interface BaseAuthFormProps {
 
 interface LoginFormProps extends BaseAuthFormProps {
   mode: "login";
+  redirectUrl?: string;
 }
 
 interface RegisterFormProps extends BaseAuthFormProps {
@@ -74,7 +75,7 @@ const getFormConfig = (mode: AuthMode) => {
 };
 
 // Komponent dla logowania
-const LoginForm: React.FC<LoginFormProps> = ({ isLoading: externalLoading = false, error }) => {
+const LoginForm: React.FC<LoginFormProps> = ({ isLoading: externalLoading = false, error, redirectUrl }) => {
   const config = getFormConfig("login");
   const [submitError, setSubmitError] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
@@ -96,7 +97,11 @@ const LoginForm: React.FC<LoginFormProps> = ({ isLoading: externalLoading = fals
 
       // Client-side redirect po udanym logowaniu
       if (response.user) {
-        authService.redirectAfterLogin(response.user.role);
+        if (redirectUrl) {
+          window.location.href = redirectUrl;
+        } else {
+          authService.redirectAfterLogin(response.user.role);
+        }
       }
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : "Wystąpił błąd");
@@ -161,6 +166,9 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ teacherId, isLoading: exter
   const config = getFormConfig("register");
   const [submitError, setSubmitError] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
+  const [teachers, setTeachers] = useState<Array<{ id: string; first_name: string; last_name: string; teachers: Array<{ bio: string | null; description: string | null; lessons_completed: number }> }>>([]);
+  const [teachersLoading, setTeachersLoading] = useState(false);
+  const [teachersError, setTeachersError] = useState<string>("");
 
   const {
     register,
@@ -174,6 +182,57 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ teacherId, isLoading: exter
   });
 
   const watchedRole = watch("role");
+
+  // Funkcja do pobierania nauczycieli
+  const fetchTeachers = React.useCallback(async () => {
+    setTeachersLoading(true);
+    setTeachersError("");
+    
+    try {
+      const res = await fetch("/api/teachers", {
+        method: "GET",
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
+      const contentType = res.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        const text = await res.text();
+        throw new Error(`Expected JSON, got: ${contentType}. Response: ${text.substring(0, 100)}`);
+      }
+
+      const data = await res.json();
+      
+      if (data.success) {
+        setTeachers(data.data || []);
+        setTeachersError("");
+      } else {
+        const errorMsg = data.error || "Unknown error";
+        console.error("API returned error:", errorMsg);
+        setTeachersError("Nie udało się pobrać listy nauczycieli");
+        setTeachers([]);
+      }
+    } catch (err) {
+      console.error("Error fetching teachers:", err);
+      setTeachersError("Nie udało się pobrać listy nauczycieli. Spróbuj ponownie.");
+      setTeachers([]);
+    } finally {
+      setTeachersLoading(false);
+    }
+  }, []);
+
+  // Pobierz listę nauczycieli gdy użytkownik wybierze rolę student
+  React.useEffect(() => {
+    if (watchedRole === "student" && !teacherId) {
+      fetchTeachers();
+    }
+  }, [watchedRole, teacherId, fetchTeachers]);
 
   const handleFormSubmit = async (data: RegisterFormData) => {
     try {
@@ -255,6 +314,53 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ teacherId, isLoading: exter
                 </SelectContent>
               </Select>
               {errors.role && <p className="text-sm text-red-600">{errors.role.message}</p>}
+            </div>
+          )}
+
+          {/* Wybór nauczyciela dla studentów */}
+          {watchedRole === "student" && !teacherId && (
+            <div className="space-y-2">
+              <Label htmlFor="teacherId">Wybierz nauczyciela</Label>
+              {teachersLoading ? (
+                <div className="text-sm text-gray-500">Ładowanie nauczycieli...</div>
+              ) : teachersError ? (
+                <div className="space-y-2">
+                  <div className="text-sm text-red-600">{teachersError}</div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={fetchTeachers}
+                    disabled={loading || teachersLoading}
+                  >
+                    Spróbuj ponownie
+                  </Button>
+                </div>
+              ) : (
+                <Select
+                  onValueChange={(value) => setValue("teacherId", value)}
+                  disabled={loading || teachersLoading}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Wybierz nauczyciela" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {teachers.length > 0 ? (
+                      teachers.map((teacher) => (
+                        <SelectItem key={teacher.id} value={teacher.id}>
+                          {teacher.first_name} {teacher.last_name}
+                          {teacher.teachers[0]?.lessons_completed ? ` (${teacher.teachers[0].lessons_completed} lekcji)` : ""}
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <SelectItem value="" disabled>
+                        Brak dostępnych nauczycieli
+                      </SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
+              )}
+              {errors.teacherId && <p className="text-sm text-red-600">{errors.teacherId.message}</p>}
             </div>
           )}
 

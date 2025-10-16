@@ -128,7 +128,8 @@ class AuthService {
       // Przekierowanie do strony informującej o konieczności potwierdzenia email
       window.location.href = "/login?message=confirm-email";
     } else {
-      window.location.href = "/dashboard";
+      // Po udanej rejestracji, przekieruj na login z komunikatem o sukcesie
+      window.location.href = "/login?message=registration-success";
     }
   }
 }

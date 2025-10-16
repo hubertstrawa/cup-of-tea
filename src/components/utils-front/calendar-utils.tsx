@@ -1,4 +1,3 @@
-"use client";
 
 import type { ChangeEvent, Dispatch, SetStateAction } from "react";
 import type { calendarRef } from "./data";

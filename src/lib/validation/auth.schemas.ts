@@ -18,6 +18,10 @@ export const RegisterSchema = z
   .refine((data) => data.password === data.confirmPassword, {
     message: "Hasła nie są takie same.",
     path: ["confirmPassword"],
+  })
+  .refine((data) => data.role !== "student" || data.teacherId, {
+    message: "Studenci muszą wybrać co najmniej jednego nauczyciela.",
+    path: ["teacherId"],
   });
 
 export const ForgotPasswordSchema = z.object({

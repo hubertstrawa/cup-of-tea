@@ -19,7 +19,7 @@ _Note: The Supabase Auth system manages core fields such as email and encrypted 
 - **id**: UUID, PRIMARY KEY
 - **start_time**: TIMESTAMPTZ, NOT NULL
 - **end_time**: TIMESTAMPTZ, NOT NULL
-- **status**: date_status enum, NOT NULL, default 'available', CHECK (status IN ('available', 'booked', 'canceled'))
+- **status**: date_status enum, NOT NULL, default 'available', CHECK (status IN ('available', 'booked', 'canceled', 'other'))
 - **teacher_id**: UUID, NOT NULL, REFERENCES `users(id)`
 - **additional_info**: JSONB, DEFAULT '{}'::jsonb  
 Additional constraint: `end_time > start_time`

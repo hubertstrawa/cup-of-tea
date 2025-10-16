@@ -1,0 +1,146 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { createSupabaseServerInstance } from "../../db/supabase.client.ts";
+import PublicAvailabilityChecker from "../../components/public-availability-checker.tsx";
+
+export const prerender = false;
+
+// Pobranie ID tutora z parametrów URL
+const { id } = Astro.params;
+
+if (!id) {
+  return Astro.redirect("/404");
+}
+
+// Utworzenie instancji Supabase
+const supabase = createSupabaseServerInstance({
+  cookies: Astro.cookies,
+  headers: Astro.request.headers,
+});
+
+// Pobranie danych tutora
+const { data: tutor, error: tutorError } = await supabase
+  .from("users")
+  .select(`
+    id,
+    first_name,
+    last_name,
+    teachers (
+      bio,
+      description,
+      lessons_completed,
+      lessons_planned
+    )
+  `)
+  .eq("id", id)
+  .eq("role", "tutor")
+  .single();
+
+if (tutorError || !tutor) {
+  return Astro.redirect("/404");
+}
+
+// Sprawdzenie czy użytkownik jest zalogowany
+const { data: { session } } = await supabase.auth.getSession();
+const isLoggedIn = !!session;
+
+const teacherProfile = tutor.teachers?.[0];
+---
+
+<Layout title={`${tutor.first_name} ${tutor.last_name} - Lektor - Cup of Tea`}>
+  <main class="min-h-screen bg-gray-50">
+    <!-- Header z informacjami o tutorze -->
+    <div class="bg-white shadow-sm border-b">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="text-center">
+          <div class="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span class="text-2xl font-bold text-blue-600">
+              {tutor.first_name.charAt(0)}{tutor.last_name.charAt(0)}
+            </span>
+          </div>
+          <h1 class="text-3xl font-bold text-gray-900 mb-2">
+            {tutor.first_name} {tutor.last_name}
+          </h1>
+          <p class="text-lg text-gray-600 mb-4">Lektor języków obcych</p>
+          
+          {teacherProfile && (
+            <div class="flex justify-center space-x-8 text-sm text-gray-500">
+              <div class="text-center">
+                <div class="font-semibold text-gray-900">{teacherProfile.lessons_completed}</div>
+                <div>Przeprowadzonych lekcji</div>
+              </div>
+              <div class="text-center">
+                <div class="font-semibold text-gray-900">{teacherProfile.lessons_planned}</div>
+                <div>Zaplanowanych lekcji</div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+
+    <!-- Sekcja z opisem -->
+    {teacherProfile && (teacherProfile.bio || teacherProfile.description) && (
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="bg-white rounded-lg shadow-sm p-6">
+          <h2 class="text-xl font-semibold text-gray-900 mb-4">O mnie</h2>
+          {teacherProfile.bio && (
+            <div class="mb-4">
+              <h3 class="font-medium text-gray-900 mb-2">Biografia</h3>
+              <p class="text-gray-700 leading-relaxed">{teacherProfile.bio}</p>
+            </div>
+          )}
+          {teacherProfile.description && (
+            <div>
+              <h3 class="font-medium text-gray-900 mb-2">Opis</h3>
+              <p class="text-gray-700 leading-relaxed">{teacherProfile.description}</p>
+            </div>
+          )}
+        </div>
+      </div>
+    )}
+
+    <!-- Sekcja z dostępnymi terminami -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div class="bg-white rounded-lg shadow-sm">
+        <div class="p-6 border-b border-gray-200">
+          <h2 class="text-xl font-semibold text-gray-900">Dostępne terminy</h2>
+          <p class="text-gray-600 mt-1">
+            Wybierz termin, aby umówić się na lekcję
+            {!isLoggedIn && (
+              <span class="text-blue-600"> (wymagane logowanie)</span>
+            )}
+          </p>
+        </div>
+        
+        <!-- Komponent z kalendarzem i dostępnymi terminami -->
+        <div class="p-6">
+          <PublicAvailabilityChecker tutorId={id} isLoggedIn={isLoggedIn} client:load />
+        </div>
+      </div>
+    </div>
+
+    <!-- Informacja o konieczności logowania -->
+    {!isLoggedIn && (
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm text-blue-700">
+                <strong>Uwaga:</strong> Aby zarezerwować termin, musisz się 
+                <a href="/login" class="font-medium underline hover:text-blue-800">zalogować</a> 
+                lub 
+                <a href="/register" class="font-medium underline hover:text-blue-800">utworzyć konto</a>.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
+  </main>
+</Layout>

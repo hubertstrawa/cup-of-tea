@@ -27,6 +27,8 @@ declare global {
 interface ImportMetaEnv {
   readonly SUPABASE_URL: string;
   readonly SUPABASE_KEY: string;
+  readonly NODE_ENV?: string;
+  readonly SKIP_EMAIL_CONFIRMATION?: string;
 }
 
 interface ImportMeta {

@@ -1,4 +1,3 @@
-"use client";
 // import { initialEvents } from "@/components/utils-front/data";
 import type { CalendarEvent } from "@/components/utils-front/data";
 import React, { createContext, useContext, useState } from "react";
@@ -11,6 +10,7 @@ interface Event {
   start: Date;
   end: Date;
   color: string;
+  dateStatus: string;
 }
 
 interface EventsContextType {
