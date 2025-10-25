@@ -6,7 +6,7 @@ import type { ReactNode } from "react";
 interface Event {
   id: string;
   title: string;
-  description: string;
+  description?: string;
   start: Date;
   end: Date;
   color: string;
@@ -53,7 +53,7 @@ export const EventsProvider: React.FC<{ children: ReactNode }> = ({ children }) 
 
         // Ensure proper mapping from backend structure to CalendarEvent
         const mappedEvents: CalendarEvent[] = (data?.data || []).map((event: any) => ({
-          // id: String(event.id),
+          id: String(event.id),
           ...event,
           title: event.title ?? "A",
           dateStatus: event.status,
@@ -80,7 +80,7 @@ export const EventsProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   };
 
   const deleteEvent = (id: string) => {
-    setEvents((prevEvents) => prevEvents.filter((event) => Number(event.id) !== Number(id)));
+    setEvents((prevEvents) => prevEvents.filter((event) => event.id !== id));
   };
 
   return (

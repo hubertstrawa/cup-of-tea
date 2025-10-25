@@ -26,15 +26,14 @@ import type { CalendarEvent } from "@/components/utils-front/data";
 import { Button } from "./ui/button";
 import { Pencil2Icon } from "@radix-ui/react-icons";
 import { normalizeDateToMinutes } from "@/lib/utils";
+import { EventDeleteForm } from "./event-delete-form";
 
 const eventEditFormSchema = z.object({
   id: z.string(),
   title: z
     .string({ required_error: "Please enter a title." })
     .min(1, { message: "Must provide a title for this event." }),
-  description: z
-    .string({ required_error: "Please enter a description." })
-    .min(1, { message: "Must provide a description for this event." }),
+  description: z.string().optional(),
   start: z.date({
     required_error: "Please select a start time",
     invalid_type_error: "That's not a date!",
@@ -94,7 +93,6 @@ export function EventEditForm({ oldEvent, event, isDrag, displayButton, closeEve
       start: event?.start as Date,
       end: event?.end as Date,
       color: event?.backgroundColor,
-      dateStatus: event?.dateStatus,
     });
   }, [form, event]);
 
@@ -110,7 +108,7 @@ export function EventEditForm({ oldEvent, event, isDrag, displayButton, closeEve
       start: normalizedStart,
       end: normalizedEnd,
       color: data.color,
-      dateStatus: data.dateStatus,
+      dateStatus: event?.dateStatus ?? "available",
     };
 
     try {
@@ -121,6 +119,8 @@ export function EventEditForm({ oldEvent, event, isDrag, displayButton, closeEve
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          title: data.title,
+          description: data.description,
           start_time: normalizedStart.toISOString(),
           end_time: normalizedEnd.toISOString(),
         }),
@@ -258,6 +258,14 @@ export function EventEditForm({ oldEvent, event, isDrag, displayButton, closeEve
               )}
             /> */}
             <AlertDialogFooter className="pt-2">
+              <EventDeleteForm
+                id={event?.id ?? ""}
+                title={event?.title ?? ""}
+                onDeleteSuccess={() => {
+                  setEventEditOpen(false);
+                  closeEventView?.();
+                }}
+              />
               <AlertDialogCancel onClick={() => handleEditCancellation()}>Cancel</AlertDialogCancel>
               <AlertDialogAction type="submit">Save</AlertDialogAction>
             </AlertDialogFooter>

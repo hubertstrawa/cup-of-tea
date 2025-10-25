@@ -15,22 +15,59 @@ import { TrashIcon } from "@radix-ui/react-icons";
 interface EventDeleteFormProps {
   id: string;
   title?: string;
+  onDeleteSuccess?: () => void;
 }
 
-export function EventDeleteForm({ id, title }: EventDeleteFormProps) {
+export function EventDeleteForm({ id, title, onDeleteSuccess }: EventDeleteFormProps) {
   const { deleteEvent } = useEvents();
   const { eventDeleteOpen, setEventDeleteOpen, setEventViewOpen } = useEvents();
 
   const { toast } = useToast();
 
   async function onSubmit() {
-    deleteEvent(id);
-    setEventDeleteOpen(false);
-    setEventViewOpen(false);
-    toast({
-      title: "Wydarzenie usunięte",
-      action: <ToastAction altText={"Dismiss notification."}>Zamknij</ToastAction>,
-    });
+    try {
+      // Call API to delete the event
+      const response = await fetch(`/api/dates/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        toast({
+          title: "Błąd!",
+          description: "Nie udało się usunąć wydarzenia. Spróbuj ponownie.",
+          variant: "destructive",
+          action: <ToastAction altText={"Kliknij, aby zamknąć powiadomienie"}>Zamknij</ToastAction>,
+        });
+        return;
+      }
+
+      // Update local state only after successful API call
+      deleteEvent(id);
+      setEventDeleteOpen(false);
+
+      // Call custom success callback or fallback to closing event view
+      if (onDeleteSuccess) {
+        onDeleteSuccess();
+      } else {
+        setEventViewOpen(false);
+      }
+
+      toast({
+        title: "Wydarzenie usunięte!",
+        variant: "default",
+        action: <ToastAction altText={"Kliknij, aby zamknąć powiadomienie"}>Zamknij</ToastAction>,
+      });
+    } catch {
+      toast({
+        title: "Błąd!",
+        description: "Wystąpił nieoczekiwany błąd.",
+        variant: "destructive",
+        action: <ToastAction altText={"Kliknij, aby zamknąć powiadomienie"}>Zamknij</ToastAction>,
+      });
+    }
   }
 
   return (

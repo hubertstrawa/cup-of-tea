@@ -4,7 +4,7 @@ import { ScrollArea } from "./ui/scroll-area";
 import { Card } from "./ui/card";
 import { Button } from "./ui/button";
 import type { DateDTO } from "@/types";
-import { format, addDays, subDays } from "date-fns";
+import { format, addDays, subDays, startOfDay, endOfDay } from "date-fns";
 import { pl } from "date-fns/locale";
 
 interface PublicAvailabilityCheckerProps {
@@ -16,8 +16,8 @@ export default function PublicAvailabilityChecker({ tutorId, isLoggedIn }: Publi
   const dateObj = new Date();
   dateObj.setDate(dateObj.getDate() - 1);
 
-  const [date, setDate] = React.useState<Date | undefined>(undefined);
-  const [availableSlots, setAvailableSlots] = useState<DateDTO[]>([]);
+  const [startDate, setStartDate] = React.useState<Date | undefined>(undefined);
+  const [threeDaysSlots, setThreeDaysSlots] = useState<{[key: string]: DateDTO[]}>({});
   const [loading, setLoading] = useState(true);
   const [nextAvailableSlot, setNextAvailableSlot] = useState<DateDTO | null>(null);
   const [loadingInitial, setLoadingInitial] = useState(true);
@@ -36,37 +36,49 @@ export default function PublicAvailabilityChecker({ tutorId, isLoggedIn }: Publi
       const nextSlot = data.data?.[0] || null;
       setNextAvailableSlot(nextSlot);
       
-      // Ustaw datę na dzień z najbliższym dostępnym terminem lub dzisiejszą datę
+      // Ustaw datę początkową na dzień z najbliższym dostępnym terminem lub dzisiejszą datę
       if (nextSlot) {
         const slotDate = new Date(nextSlot.start_time);
-        setDate(slotDate);
+        setStartDate(startOfDay(slotDate));
       } else {
-        setDate(new Date());
+        setStartDate(startOfDay(new Date()));
       }
     } catch {
       setNextAvailableSlot(null);
-      setDate(new Date());
+      setStartDate(startOfDay(new Date()));
     } finally {
       setLoadingInitial(false);
     }
   };
 
-  // Funkcja do pobierania dostępnych terminów z API dla konkretnego tutora
-  const fetchAvailableSlots = async (selectedDate: Date) => {
+  // Funkcja do pobierania dostępnych terminów dla trzech dni
+  const fetchThreeDaysSlots = async (startDate: Date) => {
     try {
       setLoading(true);
-      const dateString = format(selectedDate, "yyyy-MM-dd");
-      const response = await fetch(`/api/public/tutor/${tutorId}/dates?date=${dateString}&status=available`);
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch available slots");
+      const slotsData: {[key: string]: DateDTO[]} = {};
+      
+      // Pobierz terminy dla trzech kolejnych dni
+      for (let i = 0; i < 3; i++) {
+        const currentDate = addDays(startDate, i);
+        const dateString = format(currentDate, "yyyy-MM-dd");
+        
+        try {
+          const response = await fetch(`/api/public/tutor/${tutorId}/dates?date=${dateString}&status=available`);
+          
+          if (response.ok) {
+            const data = await response.json();
+            slotsData[dateString] = data.data || [];
+          } else {
+            slotsData[dateString] = [];
+          }
+        } catch {
+          slotsData[dateString] = [];
+        }
       }
-
-      const data = await response.json();
-      setAvailableSlots(data.data || []);
+      
+      setThreeDaysSlots(slotsData);
     } catch {
-      // Error is handled by setting empty array
-      setAvailableSlots([]);
+      setThreeDaysSlots({});
     } finally {
       setLoading(false);
     }
@@ -84,15 +96,15 @@ export default function PublicAvailabilityChecker({ tutorId, isLoggedIn }: Publi
     window.location.href = `/booking/${slot.id}`;
   };
 
-  const navigateToDay = (direction: 'prev' | 'next') => {
-    if (!date) return;
+  const navigateThreeDays = (direction: 'prev' | 'next') => {
+    if (!startDate) return;
     
-    const newDate = direction === 'next' ? addDays(date, 1) : subDays(date, 1);
+    const newStartDate = direction === 'next' ? addDays(startDate, 3) : subDays(startDate, 3);
     
     // Nie pozwalaj na wybór dat z przeszłości
-    if (newDate <= dateObj) return;
+    if (newStartDate <= dateObj) return;
     
-    setDate(newDate);
+    setStartDate(newStartDate);
   };
 
   // Pobierz najbliższy dostępny termin i ustaw datę przy pierwszym załadowaniu
@@ -100,12 +112,12 @@ export default function PublicAvailabilityChecker({ tutorId, isLoggedIn }: Publi
     fetchAndSetNextAvailableSlot();
   }, [tutorId]);
 
-  // Pobierz dostępne terminy gdy zmieni się data
+  // Pobierz dostępne terminy dla trzech dni gdy zmieni się data początkowa
   useEffect(() => {
-    if (date && !loadingInitial) {
-      fetchAvailableSlots(date);
+    if (startDate && !loadingInitial) {
+      fetchThreeDaysSlots(startDate);
     }
-  }, [date, tutorId, loadingInitial]);
+  }, [startDate, tutorId, loadingInitial]);
 
   if (loadingInitial) {
     return (
@@ -134,127 +146,146 @@ export default function PublicAvailabilityChecker({ tutorId, isLoggedIn }: Publi
             )}
           </div>
           
-          {/* Nawigacja między dniami */}
-          <div className="flex items-center justify-center gap-4 mb-4">
+          {/* Nawigacja między grupami trzech dni */}
+          <div className="flex items-center justify-center gap-4 mb-6">
             <Button
               variant="outline"
               size="sm"
-              onClick={() => navigateToDay('prev')}
-              disabled={date && subDays(date, 1) <= dateObj}
+              onClick={() => navigateThreeDays('prev')}
+              disabled={startDate && subDays(startDate, 3) <= dateObj}
               className="px-3"
             >
-              ← Poprzedni dzień
+              ← Poprzednie 3 dni
             </Button>
             
-            <div className="text-center min-w-[200px]">
+            <div className="text-center min-w-[250px]">
               <div className="font-semibold">
-                {date ? format(date, "EEEE", { locale: pl }) : ''}
+                {startDate ? `${format(startDate, "d MMM", { locale: pl })} - ${format(addDays(startDate, 2), "d MMM yyyy", { locale: pl })}` : ''}
               </div>
-              <div className="text-sm text-muted-foreground">
-                {date ? format(date, "d MMMM yyyy", { locale: pl }) : ''}
+              <div className="text-xs text-muted-foreground">
+                Przeglądaj dostępne terminy
               </div>
             </div>
             
             <Button
               variant="outline"
               size="sm"
-              onClick={() => navigateToDay('next')}
+              onClick={() => navigateThreeDays('next')}
               className="px-3"
             >
-              Następny dzień →
+              Następne 3 dni →
             </Button>
           </div>
         </div>
 
-        <div className="flex flex-wrap justify-center mx-3 sm:flex-row">
-          {/* <div className="flex flex-col w-full py-3 sm:w-1/2 justify-center items-center">
-            <Calendar
-              mode="single"
-              selected={date}
-              onSelect={setDate}
-              disabled={(date) => date <= dateObj}
-              className="rounded-md border shadow-md"
-            />
-          </div> */}
-
-          <div className="flex flex-col w-full py-3 sm:w-1/2 mt-4 mb-2 sm:mt-0">
-            <ScrollArea className="flex h-96 px-4">
-              {loading ? (
-                <div className="flex items-center justify-center h-full">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-                </div>
-              ) : availableSlots.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
-                  <div className="text-center">Brak dostępnych terminów na wybrany dzień</div>
-                  {nextAvailableSlot && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="mt-4"
-                      onClick={() => {
-                        const slotDate = new Date(nextAvailableSlot.start_time);
-                        setDate(slotDate);
-                      }}
-                    >
-                      Przejdź do najbliższego terminu
-                    </Button>
-                  )}
-                </div>
-              ) : (
-                availableSlots.map((slot) => {
-                  const startTime = new Date(slot.start_time);
-                  const endTime = new Date(slot.end_time);
-                  const isNextAvailable = nextAvailableSlot?.id === slot.id;
-
-                  return (
-                    <Card
-                      key={slot.id}
-                      onClick={() => handleSlotClick(slot)}
-                      className={`flex flex-col py-2 px-4 my-2 mx-auto w-11/12 cursor-pointer hover:scale-[1.03] transition-all shadow-sm ${
-                        isNextAvailable 
-                          ? "bg-primary/10 hover:bg-primary/20 border-primary/20 border-2" 
-                          : "bg-secondary hover:bg-secondary/40"
-                      }`}
-                    >
-                      {isNextAvailable && (
-                        <div className="text-xs font-semibold text-primary mb-1">
-                          🎯 Najbliższy dostępny termin
-                        </div>
-                      )}
-                      <div className="font-medium">
-                        {startTime.toLocaleString("pl-PL", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                          hour12: false,
-                        })}{" "}
-                        -{" "}
-                        {endTime.toLocaleString("pl-PL", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                          hour12: false,
-                        })}
+        {/* Wyświetlanie terminów dla trzech dni */}
+        <div className="px-4 pb-4">
+          {loading ? (
+            <div className="flex items-center justify-center h-48">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {startDate && [0, 1, 2].map((dayOffset) => {
+                const currentDate = addDays(startDate, dayOffset);
+                const dateString = format(currentDate, "yyyy-MM-dd");
+                const daySlots = threeDaysSlots[dateString] || [];
+                
+                return (
+                  <div key={dateString} className="space-y-3">
+                    {/* Nagłówek dnia */}
+                    <div className="text-center p-3 bg-muted/50 rounded-lg">
+                      <div className="font-semibold text-sm">
+                        {format(currentDate, "EEEE", { locale: pl })}
                       </div>
-                      {(slot.additional_info && (
-                        typeof slot.additional_info === 'string'
-                          ? slot.additional_info.trim() !== ''
-                          : Object.keys(slot.additional_info).length > 0
-                      )) && (
-                        <div className="text-sm text-muted-foreground mt-1">
-                          {typeof slot.additional_info === 'string' 
-                            ? slot.additional_info 
-                            : JSON.stringify(slot.additional_info)
-                          }
-                        </div>
-                      )}
-                      <div className="text-xs text-muted-foreground mt-2">
-                        {isLoggedIn ? "Kliknij aby zarezerwować" : "Kliknij aby się zalogować i zarezerwować"}
+                      <div className="text-xs text-muted-foreground">
+                        {format(currentDate, "d MMMM yyyy", { locale: pl })}
                       </div>
-                    </Card>
-                  );
-                })
-              )}
-            </ScrollArea>
-          </div>
+                    </div>
+                    
+                    {/* Terminy dla tego dnia */}
+                    <div className="space-y-2 min-h-[200px]">
+                      {daySlots.length === 0 ? (
+                        <div className="flex items-center justify-center h-32 text-muted-foreground text-sm">
+                          Brak dostępnych terminów
+                        </div>
+                      ) : (
+                        daySlots.map((slot) => {
+                          const startTime = new Date(slot.start_time);
+                          const endTime = new Date(slot.end_time);
+                          const isNextAvailable = nextAvailableSlot?.id === slot.id;
+
+                          return (
+                            <Card
+                              key={slot.id}
+                              onClick={() => handleSlotClick(slot)}
+                              className={`p-3 cursor-pointer hover:scale-[1.02] transition-all shadow-sm ${
+                                isNextAvailable 
+                                  ? "bg-primary/10 hover:bg-primary/20 border-primary/20 border-2" 
+                                  : "bg-secondary hover:bg-secondary/40"
+                              }`}
+                            >
+                              {isNextAvailable && (
+                                <div className="text-xs font-semibold text-primary mb-2 flex items-center gap-1">
+                                  🎯 Najbliższy dostępny
+                                </div>
+                              )}
+                              <div className="font-medium text-sm">
+                                {startTime.toLocaleString("pl-PL", {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                  hour12: false,
+                                })}{" "}
+                                -{" "}
+                                {endTime.toLocaleString("pl-PL", {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                  hour12: false,
+                                })}
+                              </div>
+                              {(slot.additional_info && (
+                                typeof slot.additional_info === 'string'
+                                  ? slot.additional_info.trim() !== ''
+                                  : Object.keys(slot.additional_info).length > 0
+                              )) && (
+                                <div className="text-xs text-muted-foreground mt-1">
+                                  {typeof slot.additional_info === 'string' 
+                                    ? slot.additional_info 
+                                    : JSON.stringify(slot.additional_info)
+                                  }
+                                </div>
+                              )}
+                              <div className="text-xs text-muted-foreground mt-2">
+                                {isLoggedIn ? "Kliknij aby zarezerwować" : "Zaloguj się aby zarezerwować"}
+                              </div>
+                            </Card>
+                          );
+                        })
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+          
+          {/* Przycisk do przejścia do najbliższego terminu jeśli nie ma terminów w aktualnym widoku */}
+          {!loading && startDate && Object.values(threeDaysSlots).every(slots => slots.length === 0) && nextAvailableSlot && (
+            <div className="text-center mt-6">
+              <div className="text-muted-foreground mb-4">
+                Brak dostępnych terminów w tym okresie
+              </div>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  const slotDate = new Date(nextAvailableSlot.start_time);
+                  setStartDate(startOfDay(slotDate));
+                }}
+              >
+                Przejdź do najbliższego dostępnego terminu
+              </Button>
+            </div>
+          )}
         </div>
       </Card>
     </div>

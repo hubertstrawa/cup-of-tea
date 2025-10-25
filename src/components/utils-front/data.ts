@@ -69,7 +69,7 @@ export interface CalendarEvent {
   end: Date;
   dateStatus: string;
   backgroundColor?: string;
-  description: string;
+  description?: string;
 }
 
 export const initialEvents: CalendarEvent[] = [

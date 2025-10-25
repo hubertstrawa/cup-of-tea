@@ -24,7 +24,7 @@ export const datesListQuerySchema = paginationParamsSchema.extend({
 // POST /api/dates request body
 export const createDateSchema = z
   .object({
-    title: z.string().optional(),
+    title: z.string(),
     description: z.string().optional(),
     start_time: timestampSchema,
     end_time: timestampSchema,
@@ -39,6 +39,8 @@ export const createDateSchema = z
 // PUT /api/dates/{id} request body
 export const updateDateSchema = z
   .object({
+    title: z.string().optional(),
+    description: z.string().optional(),
     start_time: timestampSchema.optional(),
     end_time: timestampSchema.optional(),
     status: dateStatusSchema.optional(),

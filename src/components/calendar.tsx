@@ -186,6 +186,7 @@ export default function Calendar() {
 
       <Card className="p-3">
         <FullCalendar
+          key={events.length}
           ref={calendarRef}
           timeZone="local"
           locale="pl"
