@@ -47,6 +47,8 @@ export const GET: APIRoute = async ({ params, request, cookies }) => {
     const url = new URL(request.url);
     const dateParam = url.searchParams.get("date");
     const statusParam = url.searchParams.get("status") || "available";
+    const limitParam = url.searchParams.get("limit");
+    const fromDateParam = url.searchParams.get("from_date");
 
     let query = supabase
       .from("dates")
@@ -55,11 +57,25 @@ export const GET: APIRoute = async ({ params, request, cookies }) => {
       .eq("status", statusParam)
       .order("start_time", { ascending: true });
 
-    // Filtruj po dacie jeśli podana
+    // Filtruj po konkretnej dacie jeśli podana
     if (dateParam) {
       const startOfDay = `${dateParam}T00:00:00.000Z`;
       const endOfDay = `${dateParam}T23:59:59.999Z`;
       query = query.gte("start_time", startOfDay).lte("start_time", endOfDay);
+    }
+    
+    // Filtruj od określonej daty jeśli podana (dla najbliższego terminu)
+    if (fromDateParam) {
+      const fromDateTime = `${fromDateParam}T00:00:00.000Z`;
+      query = query.gte("start_time", fromDateTime);
+    }
+
+    // Ogranicz liczbę wyników jeśli podana
+    if (limitParam) {
+      const limit = parseInt(limitParam, 10);
+      if (!isNaN(limit) && limit > 0) {
+        query = query.limit(limit);
+      }
     }
 
     const { data: dates, error } = await query;
