@@ -56,6 +56,7 @@ export const EventsProvider: React.FC<{ children: ReactNode }> = ({ children }) 
           // id: String(event.id),
           ...event,
           title: event.title ?? "A",
+          dateStatus: event.status,
           description: event.description ?? "B",
           start: new Date(event.start_time || event.start), // Support both possible keys
           end: new Date(event.end_time || event.end),

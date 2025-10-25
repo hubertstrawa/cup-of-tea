@@ -70,6 +70,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ studentId })
         }
         const teachersData = await teachersResponse.json();
         setTeachers(teachersData.teachers || []);
+        console.log('teachersData', teachersData)
 
       } catch (err) {
         console.error('Error fetching student data:', err);
@@ -271,12 +272,12 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ studentId })
                       
                       <Separator className="my-2" />
                       
-                      <div className="flex justify-between items-center">
-                        <span className="text-xs text-gray-400">
+                      <div className="flex justify-end items-center">
+                        {/* <span className="text-xs text-gray-400">
                           Doświadczenie: {teacher.totalLessonsCompleted} lekcji
-                        </span>
+                        </span> */}
                         <Button variant="outline" size="sm">
-                          <a href={`/booking/${teacher.id}`}>Umów lekcję</a>
+                          <a href={`/tutor/${teacher.id}`}>Umów lekcję</a>
                         </Button>
                       </div>
                     </div>

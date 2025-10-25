@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { Skeleton } from "./ui/skeleton";
 import { useToast } from "./hooks/use-toast";
 
 interface Lesson {
@@ -159,6 +160,46 @@ export const LessonsPage: React.FC<LessonsPageProps> = ({ userId }) => {
 
   const statusCounts = getStatusCounts();
 
+  const LessonsTableSkeleton = () => (
+    <div className="rounded-md border">
+      <div className="border-b">
+        <div className="grid grid-cols-5 gap-4 p-4">
+          <Skeleton className="h-4 w-20" />
+          <Skeleton className="h-4 w-16" />
+          <Skeleton className="h-4 w-20" />
+          <Skeleton className="h-4 w-16" />
+          <Skeleton className="h-4 w-16 ml-auto" />
+        </div>
+      </div>
+      {Array.from({ length: 5 }).map((_, index) => (
+        <div key={index} className="border-b last:border-b-0">
+          <div className="grid grid-cols-5 gap-4 p-4 items-center">
+            <div className="space-y-1">
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-3 w-12" />
+            </div>
+            <div className="flex items-center space-x-3">
+              <Skeleton className="h-8 w-8 rounded-full" />
+              <div className="space-y-1">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-3 w-32" />
+              </div>
+            </div>
+            <div className="flex justify-center">
+              <Skeleton className="h-4 w-16" />
+            </div>
+            <div className="flex justify-center">
+              <Skeleton className="h-5 w-20 rounded-full" />
+            </div>
+            <div className="flex justify-end">
+              <Skeleton className="h-8 w-8 rounded" />
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -261,9 +302,8 @@ export const LessonsPage: React.FC<LessonsPageProps> = ({ userId }) => {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="flex justify-center items-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            </div>
+            // <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <LessonsTableSkeleton />
           ) : (
             <LessonsDataTable
               lessons={filteredLessons}

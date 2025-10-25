@@ -4,13 +4,12 @@ import type { AuthUser } from "../env.d.ts";
 
 // Publiczne ścieżki - strony auth i API endpoints
 const PUBLIC_PATHS = [
-  // Server-Rendered Astro Pages
+  "/tutor/",
   "/login",
   "/register",
   "/forgot-password",
   "/reset-password",
   "/auth-demo",
-  '/booking',
   // Auth API endpoints
   "/api/auth/login",
   "/api/auth/register",
@@ -52,7 +51,7 @@ export const onRequest = defineMiddleware(async ({ locals, cookies, url, request
     // Pobranie profilu użytkownika z bazy danych
     const { data: userProfile, error } = await supabase.from("users").select("*").eq("id", user.id).single();
 
-    console.log('Middleware - user:', user.id, 'userProfile:', userProfile, 'error:', error);
+    // console.log('Middleware - user:', user.id, 'userProfile:', userProfile, 'error:', error);
 
     if (userProfile && !error) {
       // Utworzenie obiektu AuthUser
@@ -72,11 +71,11 @@ export const onRequest = defineMiddleware(async ({ locals, cookies, url, request
       // Aktualizacja last_login_at
       await supabase.from("users").update({ last_login_at: new Date().toISOString() }).eq("id", user.id);
     } else {
-      console.log('Middleware - No user profile found or error occurred, redirecting to login');
+      // console.log('Middleware - No user profile found or error occurred, redirecting to login');
       return redirect("/login");
     }
   } else {
-    console.log('Middleware - No authenticated user, redirecting to login');
+    // console.log('Middleware - No authenticated user, redirecting to login');
     // Przekierowanie do logowania dla chronionych tras
     return redirect("/login");
   }

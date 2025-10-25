@@ -3,6 +3,7 @@ import { StudentsDataTable } from "./students-data-table";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
+import { Skeleton } from "./ui/skeleton";
 import { useToast } from "./hooks/use-toast";
 
 interface Student {
@@ -106,6 +107,44 @@ export const StudentsPage: React.FC<StudentsPageProps> = ({ userId }) => {
   const totalLessonsCompleted = students.reduce((sum, student) => sum + student.lessonsCompleted, 0);
   const totalLessonsReserved = students.reduce((sum, student) => sum + student.lessonsReserved, 0);
 
+  const StudentsTableSkeleton = () => (
+    <div className="rounded-md border">
+      <div className="border-b">
+        <div className="grid grid-cols-6 gap-4 p-4">
+          <Skeleton className="h-4 w-16" />
+          <Skeleton className="h-4 w-20" />
+          <Skeleton className="h-4 w-24" />
+          <Skeleton className="h-4 w-28" />
+          <Skeleton className="h-4 w-24" />
+          <Skeleton className="h-4 w-16 ml-auto" />
+        </div>
+      </div>
+      {Array.from({ length: 5 }).map((_, index) => (
+        <div key={index} className="border-b last:border-b-0">
+          <div className="grid grid-cols-6 gap-4 p-4 items-center">
+            <div className="flex items-center space-x-3">
+              <Skeleton className="h-8 w-8 rounded-full" />
+              <div className="space-y-1">
+                <Skeleton className="h-4 w-24" />
+              </div>
+            </div>
+            <Skeleton className="h-4 w-32" />
+            <div className="flex justify-center">
+              <Skeleton className="h-5 w-8 rounded-full" />
+            </div>
+            <div className="flex justify-center">
+              <Skeleton className="h-5 w-8 rounded-full" />
+            </div>
+            <Skeleton className="h-4 w-20 mx-auto" />
+            <div className="flex justify-end">
+              <Skeleton className="h-8 w-8 rounded" />
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -185,9 +224,7 @@ export const StudentsPage: React.FC<StudentsPageProps> = ({ userId }) => {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="flex justify-center items-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            </div>
+            <StudentsTableSkeleton />
           ) : (
             <StudentsDataTable
               students={filteredStudents}

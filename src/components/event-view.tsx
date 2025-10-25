@@ -18,7 +18,6 @@ interface EventViewProps {
 
 export function EventView({ event }: EventViewProps) {
   const { eventViewOpen, setEventViewOpen } = useEvents();
-  console.log(event);
 
   return (
     <>

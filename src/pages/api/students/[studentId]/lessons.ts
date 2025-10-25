@@ -9,8 +9,8 @@ export const GET: APIRoute = async ({ params, locals }) => {
 
   console.log('Student Lessons API - studentId:', studentId, 'user:', user);
 
-  // Check if user is authenticated and is the student or admin
-  if (!user || (user.id !== studentId && user.role !== "admin")) {
+  // Check if user is authenticated and is the student
+  if (!user || user.id !== studentId) {
     console.log('Student Lessons API - Unauthorized:', { user: user?.id, studentId, role: user?.role });
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
@@ -76,11 +76,11 @@ export const GET: APIRoute = async ({ params, locals }) => {
 
     // Separate upcoming and completed lessons
     const now = new Date().toISOString();
-    const upcomingLessons = formattedLessons.filter(lesson => 
-      lesson.scheduledAt > now && lesson.status !== 'cancelled'
+    const upcomingLessons = formattedLessons.filter(lesson =>
+      lesson.scheduledAt > now && lesson.status !== 'canceled'
     );
-    const completedLessons = formattedLessons.filter(lesson => 
-      lesson.scheduledAt <= now || lesson.status === 'completed'
+    const completedLessons = formattedLessons.filter(lesson =>
+      lesson.scheduledAt <= now || lesson.status === 'completed' || lesson.status === 'canceled'
     );
 
     return new Response(JSON.stringify({ 

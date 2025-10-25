@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
+import { Skeleton } from "./ui/skeleton";
 
 interface User {
   email: string;
@@ -11,11 +12,52 @@ interface User {
   lastName: string;
 }
 
+interface TutorStats {
+  activeStudents: number;
+  lessonsThisMonth: number;
+  plannedLessons: number;
+}
+
+interface StudentStats {
+  lessonsCompleted: number;
+  lessonsPlanned: number;
+  totalHours: number;
+}
+
+type UserStats = TutorStats | StudentStats;
+
 interface ProfilePageProps {
-  user: User;
+  user: User & { id: string };
 }
 
 export const ProfilePage: React.FC<ProfilePageProps> = ({ user }) => {
+  const [stats, setStats] = useState<UserStats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const response = await fetch(`/api/stats/${user.id}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch statistics');
+        }
+
+        const data = await response.json();
+        setStats(data);
+      } catch (err) {
+        console.error('Error fetching stats:', err);
+        setError('Nie udało się pobrać statystyk');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, [user.id]);
   const getInitials = (firstName: string, lastName: string) => {
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
   };
@@ -143,33 +185,55 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ user }) => {
               <CardTitle>Statystyki</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {user.role === "tutor" ? (
+              {loading ? (
+                <>
+                  <Skeleton className="h-20 w-full rounded-lg" />
+                  <Skeleton className="h-20 w-full rounded-lg" />
+                  <Skeleton className="h-20 w-full rounded-lg" />
+                </>
+              ) : error ? (
+                <div className="text-center p-4 text-red-600">
+                  {error}
+                </div>
+              ) : user.role === "tutor" ? (
                 <>
                   <div className="text-center p-4 bg-blue-50 rounded-lg">
-                    <div className="text-2xl font-bold text-blue-600">0</div>
+                    <div className="text-2xl font-bold text-blue-600">
+                      {(stats as TutorStats)?.activeStudents || 0}
+                    </div>
                     <div className="text-sm text-blue-600">Aktywni uczniowie</div>
                   </div>
                   <div className="text-center p-4 bg-green-50 rounded-lg">
-                    <div className="text-2xl font-bold text-green-600">0</div>
+                    <div className="text-2xl font-bold text-green-600">
+                      {(stats as TutorStats)?.lessonsThisMonth || 0}
+                    </div>
                     <div className="text-sm text-green-600">Lekcje w tym miesiącu</div>
                   </div>
                   <div className="text-center p-4 bg-purple-50 rounded-lg">
-                    <div className="text-2xl font-bold text-purple-600">0</div>
+                    <div className="text-2xl font-bold text-purple-600">
+                      {(stats as TutorStats)?.plannedLessons || 0}
+                    </div>
                     <div className="text-sm text-purple-600">Zaplanowane lekcje</div>
                   </div>
                 </>
               ) : (
                 <>
                   <div className="text-center p-4 bg-blue-50 rounded-lg">
-                    <div className="text-2xl font-bold text-blue-600">0</div>
+                    <div className="text-2xl font-bold text-blue-600">
+                      {(stats as StudentStats)?.lessonsCompleted || 0}
+                    </div>
                     <div className="text-sm text-blue-600">Odbyte lekcje</div>
                   </div>
                   <div className="text-center p-4 bg-green-50 rounded-lg">
-                    <div className="text-2xl font-bold text-green-600">0</div>
+                    <div className="text-2xl font-bold text-green-600">
+                      {(stats as StudentStats)?.lessonsPlanned || 0}
+                    </div>
                     <div className="text-sm text-green-600">Zaplanowane lekcje</div>
                   </div>
                   <div className="text-center p-4 bg-purple-50 rounded-lg">
-                    <div className="text-2xl font-bold text-purple-600">0</div>
+                    <div className="text-2xl font-bold text-purple-600">
+                      {(stats as StudentStats)?.totalHours || 0}
+                    </div>
                     <div className="text-sm text-purple-600">Godziny nauki</div>
                   </div>
                 </>

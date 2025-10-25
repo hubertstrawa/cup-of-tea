@@ -62,8 +62,6 @@ const getRandomDays = (min: number, max: number) => Math.floor(Math.random() * (
 
 const currentDate = new Date();
 
-console.log(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + getRandomDays(20, 24), 9, 0);
-
 export interface CalendarEvent {
   id: string;
   title: string;

@@ -361,6 +361,19 @@ export type Database = {
         Args: { p_student_id: string; p_teacher_id: string }
         Returns: undefined
       }
+      recalculate_teacher_students_stats: {
+        Args: { p_teacher_id: string; p_student_id?: string }
+        Returns: undefined
+      }
+      sync_teacher_students_on_lesson_status_change: {
+        Args: { 
+          p_teacher_id: string
+          p_student_id: string
+          p_old_status: string | null
+          p_new_status: string | null
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       date_status: "available" | "booked" | "canceled" | "other"

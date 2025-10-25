@@ -9,8 +9,8 @@ export const GET: APIRoute = async ({ params, locals }) => {
 
   console.log('Student Teachers API - studentId:', studentId, 'user:', user);
 
-  // Check if user is authenticated and is the student or admin
-  if (!user || (user.id !== studentId && user.role !== "admin")) {
+  // Check if user is authenticated and is the student
+  if (!user || user.id !== studentId) {
     console.log('Student Teachers API - Unauthorized:', { user: user?.id, studentId, role: user?.role });
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,

@@ -115,47 +115,17 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       );
     }
 
-    // Jeśli to pierwsza lekcja, utwórz lub zaktualizuj relację teacher-student
-    if (isFirstLesson) {
-      const { error: relationError } = await supabase
-        .from("teacher_students")
-        .upsert({
-          teacher_id: teacherId,
-          student_id: user.id,
-          lessons_completed: 0,
-          lessons_reserved: 1,
-        }, {
-          onConflict: "teacher_id,student_id"
-        });
+    // Zapisz dodatkowe informacje o pierwszej lekcji
+    if (isFirstLesson && languageLevel) {
+      const { error: metadataError } = await supabase
+        .from("reservations")
+        .update({
+          notes: notes ? `${notes}\n\nPoziom języka: ${languageLevel}` : `Poziom języka: ${languageLevel}`
+        })
+        .eq("id", reservation.id);
 
-      if (relationError) {
-        console.error("Error creating/updating teacher-student relation:", relationError);
-        // Nie przerywamy procesu, ale logujemy błąd
-      }
-
-      // Zapisz dodatkowe informacje o pierwszej lekcji
-      if (languageLevel) {
-        const { error: metadataError } = await supabase
-          .from("reservations")
-          .update({
-            notes: notes ? `${notes}\n\nPoziom języka: ${languageLevel}` : `Poziom języka: ${languageLevel}`
-          })
-          .eq("id", reservation.id);
-
-        if (metadataError) {
-          console.error("Error updating reservation metadata:", metadataError);
-        }
-      }
-    } else {
-      // Zaktualizuj liczbę zarezerwowanych lekcji
-      const { error: updateRelationError } = await supabase
-        .rpc('increment_lessons_reserved', {
-          p_teacher_id: teacherId,
-          p_student_id: user.id
-        });
-
-      if (updateRelationError) {
-        console.error("Error updating lessons reserved count:", updateRelationError);
+      if (metadataError) {
+        console.error("Error updating reservation metadata:", metadataError);
       }
     }
 
@@ -175,7 +145,29 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
     if (lessonError) {
       console.error("Error creating lesson:", lessonError);
-      // Nie przerywamy procesu, ale logujemy błąd
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: "Failed to create lesson",
+        }),
+        { status: 500, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    // Synchronize teacher_students table for the new lesson
+    const { error: syncError } = await supabase.rpc(
+      'sync_teacher_students_on_lesson_status_change',
+      {
+        p_teacher_id: teacherId,
+        p_student_id: user.id,
+        p_old_status: null, // New lesson, no previous status
+        p_new_status: "planned"
+      }
+    );
+
+    if (syncError) {
+      console.error("Error synchronizing teacher_students for new lesson:", syncError);
+      // Log the error but don't fail the request - lesson was created successfully
     }
 
     return new Response(

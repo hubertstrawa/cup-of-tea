@@ -26,7 +26,6 @@ interface NavigationItem {
 }
 
 export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, user, activeView = "calendar" }) => {
-  console.log('user', user);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const navigationItems: NavigationItem[] = [

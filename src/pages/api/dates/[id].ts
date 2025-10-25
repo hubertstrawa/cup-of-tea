@@ -9,7 +9,6 @@ import { updateDateSchema, dateIdParamSchema } from "../../../lib/validation/dat
  */
 export const PUT: APIRoute = async ({ params, request, locals }) => {
   try {
-    console.log('params',params)
     // Validate URL parameters
     const {
       data: { user },

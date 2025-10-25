@@ -227,7 +227,7 @@ export function EventAddForm({ start, end }: EventAddFormProps) {
                 </FormItem>
               )}
             />
-            <FormField
+            {/* <FormField
               control={form.control}
               name="color"
               render={({ field }) => (
@@ -252,7 +252,7 @@ export function EventAddForm({ start, end }: EventAddFormProps) {
                   <FormMessage />
                 </FormItem>
               )}
-            />
+            /> */}
             <AlertDialogFooter className="pt-2">
               <AlertDialogCancel onClick={() => setEventAddOpen(false)}>Cancel</AlertDialogCancel>
               <AlertDialogAction type="submit">Add Event</AlertDialogAction>

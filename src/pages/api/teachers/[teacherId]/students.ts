@@ -48,6 +48,8 @@ export const GET: APIRoute = async ({ params, locals }) => {
       });
     }
 
+    console.log('teacherStudents',teacherStudents)
+
     // Get email addresses for students (from auth.users)
     const studentIds = teacherStudents?.map(ts => ts.student_id) || [];
     const emailPromises = studentIds.map(async (studentId) => {

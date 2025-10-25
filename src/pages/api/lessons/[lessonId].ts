@@ -23,10 +23,10 @@ export const PATCH: APIRoute = async ({ params, request, locals }) => {
     const body = await request.json();
     const { status, scheduledAt, durationMinutes } = body;
 
-    // Verify that the lesson belongs to this teacher
+    // Verify that the lesson belongs to this teacher and get current data
     const { data: lesson, error: lessonError } = await supabase
       .from("lessons")
-      .select("teacher_id")
+      .select("teacher_id, student_id, status")
       .eq("id", lessonId)
       .single();
 
@@ -43,6 +43,9 @@ export const PATCH: APIRoute = async ({ params, request, locals }) => {
         headers: { "Content-Type": "application/json" },
       });
     }
+
+    // Store old status for synchronization
+    const oldStatus = lesson.status;
 
     // Update the lesson
     const updateData: any = {};
@@ -61,6 +64,24 @@ export const PATCH: APIRoute = async ({ params, request, locals }) => {
         status: 500,
         headers: { "Content-Type": "application/json" },
       });
+    }
+
+    // Synchronize teacher_students table if status changed
+    if (status && status !== oldStatus) {
+      const { error: syncError } = await supabase.rpc(
+        'sync_teacher_students_on_lesson_status_change',
+        {
+          p_teacher_id: lesson.teacher_id,
+          p_student_id: lesson.student_id,
+          p_old_status: oldStatus,
+          p_new_status: status
+        }
+      );
+
+      if (syncError) {
+        console.error("Error synchronizing teacher_students:", syncError);
+        // Log the error but don't fail the request - lesson was updated successfully
+      }
     }
 
     return new Response(JSON.stringify({ success: true }), {

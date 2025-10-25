@@ -77,11 +77,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       );
     }
 
-    console.log("user", user);
-
     const validatedData = createDateSchema.parse(body);
-
-    console.log("validatedData", validatedData);
 
     if (!user?.id) {
       return new Response(JSON.stringify({ error: "User not found" }), {

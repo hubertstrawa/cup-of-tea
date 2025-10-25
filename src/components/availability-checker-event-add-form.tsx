@@ -158,7 +158,7 @@ export function AvailabilityCheckerEventAddForm({ start, end }: AvailabilityChec
                 </FormItem>
               )}
             />
-            <FormField
+            {/* <FormField
               control={form.control}
               name="color"
               render={({ field }) => (
@@ -183,7 +183,7 @@ export function AvailabilityCheckerEventAddForm({ start, end }: AvailabilityChec
                   <FormMessage />
                 </FormItem>
               )}
-            />
+            /> */}
             <AlertDialogFooter className="pt-2">
               <AlertDialogCancel onClick={() => setAvailabilityCheckerEventAddOpen(false)}>Cancel</AlertDialogCancel>
               <AlertDialogAction type="submit">Add Event</AlertDialogAction>

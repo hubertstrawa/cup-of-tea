@@ -54,8 +54,6 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       .eq("id", data.user.id)
       // .single();
 
-      console.log('userProfile', userProfile);
-
     if (profileError || !userProfile) {
       return createErrorResponse(AUTH_ERRORS.USER_NOT_FOUND);
     }

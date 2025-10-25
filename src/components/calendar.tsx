@@ -180,7 +180,6 @@ export default function Calendar() {
 
   const calendarEarliestTime = `${earliestHour}:${earliestMin}`;
   const calendarLatestTime = `${latestHour}:${latestMin}`;
-  console.log("earliestHour", earliestHour);
   return (
     <div className="space-y-5">
       <CalendarNav calendarRef={calendarRef} start={selectedStart} end={selectedEnd} viewedDate={viewedDate} />

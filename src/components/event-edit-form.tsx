@@ -102,7 +102,6 @@ export function EventEditForm({ oldEvent, event, isDrag, displayButton, closeEve
     // Normalize dates to ensure seconds and milliseconds are 0
     const normalizedStart = normalizeDateToMinutes(data.start);
     const normalizedEnd = normalizeDateToMinutes(data.end);
-    console.log("data", data);
 
     const newEvent = {
       id: data.id,
@@ -232,7 +231,7 @@ export function EventEditForm({ oldEvent, event, isDrag, displayButton, closeEve
                 </FormItem>
               )}
             />
-            <FormField
+            {/* <FormField
               control={form.control}
               name="color"
               render={({ field }) => (
@@ -257,7 +256,7 @@ export function EventEditForm({ oldEvent, event, isDrag, displayButton, closeEve
                   <FormMessage />
                 </FormItem>
               )}
-            />
+            /> */}
             <AlertDialogFooter className="pt-2">
               <AlertDialogCancel onClick={() => handleEditCancellation()}>Cancel</AlertDialogCancel>
               <AlertDialogAction type="submit">Save</AlertDialogAction>
