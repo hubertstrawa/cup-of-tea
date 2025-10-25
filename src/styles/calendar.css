@@ -1,20 +1,30 @@
 @reference "./global.css";
 :root {
-    --fc-border-color: lightgray;
-    --fc-page-bg-color: none;
+    --fc-border-color: hsl(var(--border));
+    --fc-page-bg-color: transparent;
+    --fc-today-bg-color: hsl(var(--muted) / 0.3);
+    --fc-event-bg-color: hsl(var(--primary));
+    --fc-event-border-color: hsl(var(--primary));
+    --fc-event-text-color: hsl(var(--primary-foreground));
   }
   .dark {
-    --fc-border-color: gray;
+    --fc-border-color: hsl(var(--border));
+    --fc-today-bg-color: hsl(var(--muted) / 0.2);
   }
   
-  /* Removing borders */
+  /* Enhanced borders and grid */
   
   .fc-scrollgrid {
-    @apply !border-none;
+    @apply !border-none !rounded-lg;
   }
 
   .fc-day .fc-day-today .fc-daygrid-day {
-    background-color: transparent !important;
+    background-color: var(--fc-today-bg-color) !important;
+    @apply !border-primary/20;
+  }
+
+  .fc-scrollgrid-section > * {
+    @apply !border-border;
   }
   
   .fc tbody tr:last-child td:first-child {
@@ -37,72 +47,105 @@
     @apply !border-r-0;
   }
   
-  /* Setting header size */
+  /* Enhanced header styling */
   
   .fc-col-header-cell-cushion {
-    @apply flex h-14 items-center;
+    @apply flex h-16 items-center justify-center;
+  }
+
+  .fc-col-header-cell {
+    @apply !bg-muted/30 !border-border;
+  }
+
+  .fc-col-header {
+    @apply !border-b-2 !border-border;
   }
   
-  /* Setting left time size */
+  /* Enhanced time grid styling */
   
   .fc-timegrid-slot {
-    @apply !h-6;
+    @apply !h-8 !border-border/50;
   }
   
   .fc-timegrid-slot-label-cushion {
-    @apply !text-xs !font-light;
+    @apply !text-xs !font-medium !text-muted-foreground !pr-2;
+  }
+
+  .fc-timegrid-axis {
+    @apply !bg-muted/20 !border-border;
+  }
+
+  .fc-timegrid-slot-minor {
+    @apply !border-border/30;
   }
   
-  /* Setting cell colors */
+  /* Enhanced cell styling */
   
   td.fc-daygrid-day.fc-day {
-    @apply hover:bg-secondary;
+    @apply hover:bg-muted/50 !transition-colors !duration-200;
   }
   
-  /* td.fc-daygrid-day.fc-day.fc-day-today {
-    @apply !bg-secondary-foreground;
-  } */
-  
   .fc-day-today {
-    @apply !bg-inherit;
+    @apply !bg-primary/5 !border-primary/20;
   }
   
   .fc-day-other {
-    @apply !bg-gray-200 dark:bg-secondary;
+    @apply !bg-muted/20 !text-muted-foreground;
+  }
+
+  .fc-timegrid-col.fc-day-today {
+    @apply !bg-primary/5;
+  }
+
+  .fc-timegrid-col {
+    @apply !border-border/50;
   }
   
   .fc-daygrid-day-top {
-    @apply !flex !flex-row !h-8 !w-full !items-center;
+    @apply !flex !flex-row !h-10 !w-full !items-center !justify-center;
   }
   
   .fc-daygrid-dot-event {
-    @apply hover:bg-blue-50;
+    @apply hover:bg-primary/10 !transition-colors;
   }
   
   .fc-daygrid-event-harness {
-    @apply !pr-2 hover:!scale-[1.02] transition-all hover:cursor-pointer;
+    @apply !pr-2 hover:!scale-[1.02] !transition-all hover:cursor-pointer !mb-1;
   }
   
   .fc-timegrid-event-harness {
-    @apply hover:bg-none hover:cursor-pointer;
+    @apply hover:cursor-pointer !transition-all hover:!scale-[1.01];
+  }
+
+  .fc-daygrid-day-number {
+    @apply !p-2 !font-medium;
   }
   
   .fc-event-main {
-    @apply !flex !w-full !h-full;
+    @apply !flex !w-full !h-full !rounded-md;
   }
   
   .fc-event {
-    @apply !flex !border-none !min-w-full;
+    @apply !flex !border-none !min-w-full !rounded-md !shadow-sm;
   }
   
   .fc-daygrid-event {
-    @apply !mx-1;
+    @apply !mx-1 !rounded-lg !shadow-sm;
   }
   
   .fc-timegrid-event {
-    @apply !px-1;
+    @apply !px-2 !py-1 !rounded-md !shadow-sm;
+  }
+
+  .fc-event-title {
+    @apply !font-medium !text-sm;
+  }
+
+  .fc-event-time {
+    @apply !font-normal !text-xs !opacity-90;
   }
   
+  /* Pointer events and interactions */
   td.fc-daygrid-day.fc-day {
     pointer-events: none !important;
   }
@@ -119,5 +162,37 @@
   
   .fc-daygrid-day-top {
     pointer-events: none !important;
+  }
+
+  /* Now indicator styling */
+  .fc-timegrid-now-indicator-line {
+    @apply !border-primary !border-2 !shadow-sm;
+  }
+
+  .fc-timegrid-now-indicator-arrow {
+    @apply !border-primary;
+  }
+
+  /* Scrollbar styling */
+  .fc-scroller {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted-foreground)) transparent;
+  }
+
+  .fc-scroller::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .fc-scroller::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .fc-scroller::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--muted-foreground));
+    border-radius: 3px;
+  }
+
+  .fc-scroller::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--foreground));
   }
   

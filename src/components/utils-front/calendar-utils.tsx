@@ -25,6 +25,26 @@ export function goNext(calendarRef: calendarRef) {
   calendarApi.next();
 }
 
+// New utility functions for better navigation
+export function goToSpecificDate(calendarRef: calendarRef, date: Date) {
+  const calendarApi = calendarRef.current!.getApi();
+  calendarApi.gotoDate(date);
+}
+
+export function getCurrentView(calendarRef: calendarRef): string {
+  const calendarApi = calendarRef.current!.getApi();
+  return calendarApi.view.type;
+}
+
+export function getVisibleRange(calendarRef: calendarRef) {
+  const calendarApi = calendarRef.current!.getApi();
+  return {
+    start: calendarApi.view.activeStart,
+    end: calendarApi.view.activeEnd,
+    current: calendarApi.view.currentStart
+  };
+}
+
 export function goToday(calendarRef: calendarRef) {
   const calendarApi = calendarRef.current!.getApi();
   calendarApi.today();
