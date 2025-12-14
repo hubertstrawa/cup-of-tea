@@ -1,13 +1,35 @@
 {
   "extends": "astro/tsconfigs/strict",
-  "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["dist"],
+  "include": [
+    ".astro/types.d.ts", 
+    "**/*",
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    "src/**/*.spec.ts", 
+    "src/**/*.spec.tsx",
+    "src/**/__tests__/**/*",
+    "vitest.config.ts"
+  ],
+  "exclude": ["dist", "node_modules"],
   "compilerOptions": {
     "jsx": "react-jsx",
     "jsxImportSource": "react",
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    "types": [
+      "vitest/globals",
+      "@testing-library/jest-dom",
+      "node"
+    ],
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true
+  },
+  "ts-node": {
+    "esm": true
   }
 }

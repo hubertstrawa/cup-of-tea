@@ -132,6 +132,66 @@ class AuthService {
       window.location.href = "/login?message=registration-success";
     }
   }
+
+  // Aliases for test compatibility
+  async signUp(data: RegisterFormData): Promise<{ success: boolean; error?: string; user?: any }> {
+    try {
+      const response = await this.register(data);
+      return {
+        success: true,
+        user: response.user,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error occurred',
+      };
+    }
+  }
+
+  async signIn(data: LoginFormData): Promise<{ success: boolean; error?: string; user?: any }> {
+    try {
+      const response = await this.login(data);
+      return {
+        success: true,
+        user: response.user,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error occurred',
+      };
+    }
+  }
+
+  async signOut(): Promise<{ success: boolean; error?: string }> {
+    try {
+      await this.logout();
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error occurred',
+      };
+    }
+  }
+
+  async getCurrentUser(): Promise<{ success: boolean; error?: string; user?: any }> {
+    try {
+      const response = await this.getUser();
+      return {
+        success: true,
+        user: response.user,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error occurred',
+      };
+    }
+  }
 }
 
+// Export both class and instance
+export { AuthService };
 export const authService = new AuthService();

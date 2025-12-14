@@ -1,0 +1,479 @@
+---
+description: Plan testów dla aplikacji Cup of Tea
+globs: 
+alwaysApply: false
+---
+
+# Plan Testów - Cup of Tea
+
+## 1. Wprowadzenie i Cele Testowania
+
+### 1.1 Cel Dokumentu
+Niniejszy plan testów definiuje kompleksową strategię testowania aplikacji Cup of Tea - platformy MVP do zarządzania kalendarzem i rezerwacjami lekcji języków obcych między lektorami a uczniami.
+
+### 1.2 Cele Testowania
+- **Bezpieczeństwo:** Weryfikacja systemu autentykacji i autoryzacji użytkowników
+- **Integralność danych:** Zapewnienie spójności transakcji rezerwacji i aktualizacji bazy danych
+- **Funkcjonalność:** Potwierdzenie poprawnego działania kluczowych funkcji aplikacji
+- **Wydajność:** Ocena responsywności systemu przy różnych obciążeniach
+- **Użyteczność:** Weryfikacja intuicyjności interfejsu użytkownika
+- **Dostępność:** Zapewnienie zgodności z wytycznymi WCAG 2.1
+
+### 1.3 Kryteria Sukcesu
+- 90% pokrycie kodu testami jednostkowymi dla logiki biznesowej
+- 100% pokrycie testami API endpoints
+- Wszystkie scenariusze krytyczne przechodzą pomyślnie
+- Brak krytycznych błędów bezpieczeństwa
+- Czas odpowiedzi API poniżej 500ms dla 95% requestów
+
+## 2. Zakres Testów
+
+### 2.1 Elementy Podlegające Testowaniu
+- **API Endpoints:** /api/bookings, /api/dates, /api/teachers
+- **Komponenty React:** Wszystkie komponenty w /src/components/
+- **Hooki Custom:** useUser, useYearChange, useMonthChange, useAnimationTrigger
+- **Serwisy:** DatesService, ErrorHandler
+- **Walidacje:** Schematy Zod
+- **Middleware Astro:** Autentykacja i autoryzacja
+- **Baza danych:** Migracje, RLS policies, funkcje RPC
+
+### 2.2 Elementy Wyłączone z Testowania
+- Komponenty Shadcn/ui (przetestowane przez dostawcę)
+- Zewnętrzne biblioteki (FullCalendar, React Hook Form)
+- Konfiguracje Tailwind CSS
+- Pliki statyczne w /public/
+
+### 2.3 Funkcjonalności Krytyczne
+1. Rejestracja i logowanie użytkowników
+2. Tworzenie i zarządzanie terminami przez lektorów
+3. Rezerwacja terminów przez uczniów
+4. System powiadomień i błędów
+5. Synchronizacja relacji teacher-student
+
+## 3. Typy Testów
+
+### 3.1 Testy Jednostkowe (Unit Tests) - Vitest
+**Zakres:** Funkcje, hooki, serwisy, komponenty w izolacji
+**Narzędzia:** Vitest, React Testing Library, jsdom
+**Pokrycie:** 90% dla logiki biznesowej
+
+### 3.2 Testy Integracyjne (Integration Tests)
+**Zakres:** Interakcje między komponentami, API z bazą danych
+**Narzędzia:** Vitest + Supabase Test Client
+**Fokus:** Przepływ danych, transakcje bazodanowe
+
+### 3.3 Testy API (API Tests)
+**Zakres:** Wszystkie endpointy REST API
+**Narzędzia:** Vitest + Supertest/fetch
+**Fokus:** Walidacja requestów/responses, autoryzacja, obsługa błędów
+
+### 3.4 Testy E2E (End-to-End Tests)
+**Zakres:** Pełne scenariusze użytkownika
+**Narzędzia:** Playwright (do rozważenia w przyszłości)
+**Fokus:** Krytyczne ścieżki użytkownika
+
+### 3.5 Testy Dostępności (A11y Tests)
+**Zakres:** Komponenty UI
+**Narzędzia:** axe-core, WAVE
+**Fokus:** WCAG 2.1 compliance
+
+### 3.6 Testy Wydajnościowe (Performance Tests)
+**Zakres:** API endpoints, renderowanie komponentów
+**Narzędzia:** Vitest + custom benchmarks
+**Fokus:** Czas odpowiedzi, optymalizacja zapytań
+
+## 4. Scenariusze Testowe dla Kluczowych Funkcjonalności
+
+### 4.1 Moduł Autentykacji
+
+#### 4.1.1 Rejestracja Lektora
+**Warunki wstępne:** Brak konta w systemie
+**Kroki:**
+1. Przejście na stronę rejestracji
+2. Wypełnienie formularza danymi lektora
+3. Przesłanie formularza
+4. Weryfikacja emaila
+
+**Oczekiwany wynik:** Utworzenie konta lektora, wysłanie emaila weryfikacyjnego
+
+#### 4.1.2 Rejestracja Ucznia przez Link
+**Warunki wstępne:** Link wygenerowany przez lektora
+**Kroki:**
+1. Kliknięcie w link rejestracyjny
+2. Wypełnienie formularza ucznia
+3. Przesłanie formularza
+4. Automatyczne przypisanie do lektora
+
+**Oczekiwany wynik:** Utworzenie konta ucznia, relacja z lektorem
+
+#### 4.1.3 Logowanie
+**Warunki wstępne:** Istniejące zweryfikowane konto
+**Kroki:**
+1. Wprowadzenie poprawnych danych logowania
+2. Przesłanie formularza
+3. Przekierowanie do dashboard
+
+**Oczekiwany wynik:** Pomyślne logowanie, sesja użytkownika
+
+### 4.2 Moduł Zarządzania Terminami
+
+#### 4.2.1 Dodawanie Terminu przez Lektora
+**Warunki wstępne:** Zalogowany lektor
+**Kroki:**
+1. Przejście do kalendarza
+2. Wybór daty i godziny
+3. Wypełnienie formularza terminu
+4. Zapisanie terminu
+
+**Oczekiwany wynik:** Nowy termin w bazie, wyświetlenie w kalendarzu
+
+#### 4.2.2 Edycja Terminu
+**Warunki wstępne:** Istniejący termin dostępny
+**Kroki:**
+1. Wybór terminu z kalendarza
+2. Modyfikacja danych terminu
+3. Zapisanie zmian
+
+**Oczekiwany wynik:** Zaktualizowane dane terminu
+
+#### 4.2.3 Usuwanie Terminu
+**Warunki wstępne:** Istniejący termin bez rezerwacji
+**Kroki:**
+1. Wybór terminu
+2. Potwierdzenie usunięcia
+3. Usunięcie terminu
+
+**Oczekiwany wynik:** Usunięty termin z bazy i kalendarza
+
+### 4.3 Moduł Rezerwacji
+
+#### 4.3.1 Rezerwacja Terminu przez Ucznia
+**Warunki wstępne:** Zalogowany uczeń, dostępny termin
+**Kroki:**
+1. Przeglądanie dostępnych terminów
+2. Wybór terminu
+3. Wypełnienie formularza rezerwacji
+4. Potwierdzenie rezerwacji
+
+**Oczekiwany wynik:** Utworzona rezerwacja, zmiana statusu terminu
+
+#### 4.3.2 Konflikt Rezerwacji (Race Condition)
+**Warunki wstępne:** Dwóch uczniów próbuje zarezerwować ten sam termin
+**Kroki:**
+1. Równoczesne przesłanie formularzy rezerwacji
+2. Przetworzenie requestów przez system
+
+**Oczekiwany wynik:** Jeden request sukces, drugi błąd "termin niedostępny"
+
+#### 4.3.3 Anulowanie Rezerwacji
+**Warunki wstępne:** Istniejąca rezerwacja
+**Kroki:**
+1. Wybór rezerwacji do anulowania
+2. Potwierdzenie anulowania
+3. Przywrócenie dostępności terminu
+
+**Oczekiwany wynik:** Anulowana rezerwacja, termin ponownie dostępny
+
+### 4.4 Moduł Profili Użytkowników
+
+#### 4.4.1 Profil Lektora - Statystyki
+**Warunki wstępne:** Zalogowany lektor z historią lekcji
+**Kroki:**
+1. Przejście do profilu
+2. Wyświetlenie statystyk
+3. Weryfikacja poprawności danych
+
+**Oczekiwany wynik:** Poprawne statystyki lekcji i uczniów
+
+#### 4.4.2 Profil Ucznia - Postępy
+**Warunki wstępne:** Zalogowany uczeń z historią lekcji
+**Kroki:**
+1. Przejście do profilu
+2. Przegląd postępów
+3. Weryfikacja danych
+
+**Oczekiwany wynik:** Poprawne dane o postępach i lekcjach
+
+## 5. Środowisko Testowe
+
+### 5.1 Konfiguracja Środowisk
+
+#### 5.1.1 Lokalne Środowisko Deweloperskie
+- **Node.js:** 22.14.0 (zgodnie z .nvmrc)
+- **Supabase:** Lokalna instancja z Docker
+- **Baza danych:** PostgreSQL 15+ z testowymi danymi
+- **Auth:** Supabase Auth z testowymi użytkownikami
+
+#### 5.1.2 Środowisko CI/CD
+- **GitHub Actions:** Pipeline automatycznych testów
+- **Test Database:** Izolowana instancja per build
+- **Coverage:** Automatyczne generowanie raportów
+
+### 5.2 Dane Testowe
+- **Fixtures:** JSON z przykładowymi użytkownikami, terminami, rezerwacjami
+- **Seed Scripts:** Automatyczne populowanie bazy testowej
+- **Cleanup:** Reset bazy między testami
+
+### 5.3 Konfiguracja Testowa
+
+```typescript
+// vitest.config.ts
+export default defineConfig({
+  test: {
+    environment: 'jsdom',
+    setupFiles: ['./src/test/setup.ts'],
+    coverage: {
+      reporter: ['text', 'html', 'lcov'],
+      threshold: {
+        global: {
+          branches: 80,
+          functions: 90,
+          lines: 90,
+          statements: 90
+        }
+      }
+    }
+  }
+})
+```
+
+## 6. Narzędzia do Testowania
+
+### 6.1 Framework Testowy
+- **Vitest:** Główny framework testowy
+- **React Testing Library:** Testy komponentów React
+- **jsdom:** Symulacja DOM w Node.js
+
+### 6.2 Narzędzia Dodatkowe
+- **@testing-library/user-event:** Symulacja interakcji użytkownika
+- **msw (Mock Service Worker):** Mockowanie API calls
+- **@supabase/supabase-js:** Test client dla integracji
+- **axe-core:** Testy dostępności
+- **@testing-library/jest-dom:** Dodatkowe matchery
+
+### 6.3 Narzędzia Raportowania
+- **Istanbul/c8:** Coverage reports
+- **Allure:** Zaawansowane raportowanie (opcjonalnie)
+- **GitHub Actions:** Integracja z CI/CD
+
+### 6.4 Mockowanie i Test Doubles
+- **vi.mock():** Factory pattern dla modułów
+- **vi.spyOn():** Monitoring wywołań funkcji
+- **vi.stubGlobal():** Globalne mocki
+- **Supabase Test Helpers:** Dedicated mocks dla DB
+
+## 7. Harmonogram Testów
+
+### 7.1 Faza 1: Przygotowanie (Tydzień 1)
+- Konfiguracja środowiska testowego
+- Instalacja i konfiguracja narzędzi
+- Utworzenie danych testowych i fixtures
+- Napisanie podstawowych test utilities
+
+### 7.2 Faza 2: Testy Jednostkowe (Tygodnie 2-3)
+- Testy serwisów i utilities
+- Testy hooków custom
+- Testy komponentów React w izolacji
+- Testy walidacji Zod schemas
+
+### 7.3 Faza 3: Testy API (Tydzień 4)
+- Testy wszystkich endpointów API
+- Testy autoryzacji i walidacji
+- Testy obsługi błędów
+- Testy transakcji bazodanowych
+
+### 7.4 Faza 4: Testy Integracyjne (Tydzień 5)
+- Testy przepływu danych między komponentami
+- Testy interakcji z bazą danych
+- Testy middleware Astro
+- Testy pełnych scenariuszy użytkownika
+
+### 7.5 Faza 5: Testy Specjalistyczne (Tydzień 6)
+- Testy wydajnościowe
+- Testy dostępności (a11y)
+- Testy bezpieczeństwa
+- Optymalizacja i refactoring
+
+### 7.6 Faza 6: Dokumentacja i CI/CD (Tydzień 7)
+- Dokumentacja testów
+- Konfiguracja pipeline CI/CD
+- Automatyzacja raportowania
+- Training zespołu
+
+## 8. Kryteria Akceptacji Testów
+
+### 8.1 Kryteria Pokrycia
+- **Pokrycie linii:** Minimum 90% dla komponentów i serwisów
+- **Pokrycie branchy:** Minimum 85% dla logiki warunkowej
+- **Pokrycie funkcji:** Minimum 95% dla API endpoints
+- **Mutation testing:** Minimum 80% (opcjonalnie w przyszłości)
+
+### 8.2 Kryteria Funkcjonalne
+- Wszystkie scenariusze krytyczne przechodzą pomyślnie
+- Brak regresjów w istniejącej funkcjonalności
+- Poprawna obsługa przypadków brzegowych i błędów
+- Walidacja wszystkich ścieżek użytkownika
+
+### 8.3 Kryteria Wydajnościowe
+- API response time < 500ms dla 95% requestów
+- Renderowanie komponentów < 100ms
+- Brak memory leaks w testach długotrwałych
+- Optymalizacja zapytań bazodanowych
+
+### 8.4 Kryteria Bezpieczeństwa
+- Brak podatności injection attacks
+- Poprawna walidacja uprawnień użytkowników
+- Secure handling danych wrażliwych
+- Compliance z OWASP Top 10
+
+### 8.5 Kryteria Dostępności
+- WCAG 2.1 AA compliance
+- Keyboard navigation support
+- Screen reader compatibility
+- Color contrast ratio > 4.5:1
+
+## 9. Role i Odpowiedzialności
+
+### 9.1 Tech Lead/Senior Developer
+- **Odpowiedzialności:**
+  - Definiowanie strategii testowej
+  - Review testów krytycznych
+  - Mentoring zespołu w dobrych praktykach testowania
+  - Nadzór nad architekturą testową
+
+### 9.2 Frontend Developers
+- **Odpowiedzialności:**
+  - Pisanie testów komponentów React
+  - Testy hooków i utilities
+  - Testy integracyjne UI
+  - Testy dostępności (a11y)
+
+### 9.3 Backend Developers
+- **Odpowiedzialności:**
+  - Testy API endpoints
+  - Testy logiki biznesowej
+  - Testy integracji z bazą danych
+  - Testy wydajnościowe
+
+### 9.4 QA Engineer (jeśli dostępny)
+- **Odpowiedzialności:**
+  - Planowanie i wykonywanie testów E2E
+  - Automatyzacja testów regresyjnych
+  - Raportowanie i tracking defektów
+  - Walidacja kryteriów akceptacji
+
+### 9.5 DevOps Engineer
+- **Odpowiedzialności:**
+  - Konfiguracja CI/CD dla testów
+  - Środowiska testowe
+  - Monitoring i alerty
+  - Deployment automatyzacja
+
+## 10. Procedury Raportowania Błędów
+
+### 10.1 Klasyfikacja Błędów
+
+#### 10.1.1 Krytyczne (P1)
+- **Definicja:** Błędy blokujące podstawowe funkcjonalności
+- **Przykłady:** Niemożność logowania, utrata danych, błędy bezpieczeństwa
+- **SLA:** Naprawa w ciągu 24 godzin
+- **Eskalacja:** Natychmiastowa do Tech Lead
+
+#### 10.1.2 Wysokie (P2)
+- **Definicja:** Błędy wpływające na kluczowe funkcjonalności
+- **Przykłady:** Błędy rezerwacji, problemy z kalendarzem
+- **SLA:** Naprawa w ciągu 72 godzin
+- **Eskalacja:** Do odpowiedzialnego developera
+
+#### 10.1.3 Średnie (P3)
+- **Definicja:** Błędy UI/UX, drobne funkcjonalne
+- **Przykłady:** Błędy stylowania, drobne problemy z walidacją
+- **SLA:** Naprawa w następnym sprincie
+- **Eskalacja:** Standardowy workflow
+
+#### 10.1.4 Niskie (P4)
+- **Definicja:** Kosmetyczne, optymalizacje
+- **Przykłady:** Typos, drobne problemy z wydajnością
+- **SLA:** Naprawa gdy czas pozwoli
+- **Eskalacja:** Backlog
+
+### 10.2 Proces Raportowania
+
+#### 10.2.1 Identyfikacja Błędu
+1. **Reprodukcja:** Potwierdzenie błędu w środowisku testowym
+2. **Dokumentacja:** Zapisanie kroków reprodukcji
+3. **Środowisko:** Określenie środowiska wystąpienia
+4. **Dane testowe:** Zidentyfikowanie użytych danych
+
+#### 10.2.2 Raportowanie
+1. **GitHub Issues:** Utworzenie issue z odpowiednimi labelkami
+2. **Template:** Wykorzystanie szablonu bug report
+3. **Priorytet:** Przypisanie odpowiedniej kategorii
+4. **Assignee:** Przekazanie odpowiedzialnej osobie
+
+#### 10.2.3 Tracking i Follow-up
+1. **Status Updates:** Regularne aktualizacje statusu
+2. **Verification:** Weryfikacja napraw
+3. **Regression Testing:** Testy regresyjne po naprawie
+4. **Documentation:** Aktualizacja dokumentacji testowej
+
+### 10.3 Template Bug Report
+
+```markdown
+## Bug Report
+
+### Opis problemu
+[Krótki opis błędu]
+
+### Środowisko
+- **Browser:** [nazwa i wersja]
+- **OS:** [system operacyjny]
+- **Wersja aplikacji:** [commit hash/tag]
+- **Środowisko:** [local/staging/production]
+
+### Kroki reprodukcji
+1. [Krok pierwszy]
+2. [Krok drugi]
+3. [Krok trzeci]
+
+### Oczekiwany wynik
+[Co powinno się wydarzyć]
+
+### Faktyczny wynik
+[Co faktycznie się dzieje]
+
+### Dane testowe
+[Użyte dane/konta testowe]
+
+### Screenshots/Videos
+[Załączniki wizualne]
+
+### Logi
+[Relevantne logi z konsoli/serwera]
+
+### Priorytet
+[P1/P2/P3/P4]
+
+### Dodatkowe informacje
+[Inne istotne szczegóły]
+```
+
+### 10.4 Metrics i KPIs
+
+#### 10.4.1 Metryki Jakości
+- **Defect Density:** Liczba błędów na 1000 linii kodu
+- **Defect Removal Efficiency:** % błędów znalezionych przed produkcją
+- **Test Coverage:** % pokrycia kodu testami
+- **Test Pass Rate:** % testów przechodzących pomyślnie
+
+#### 10.4.2 Metryki Procesowe
+- **Mean Time to Resolution (MTTR):** Średni czas naprawy błędu
+- **Test Execution Time:** Czas wykonywania pełnej suity testów
+- **CI/CD Success Rate:** % buildów przechodzących pomyślnie
+- **Flaky Test Rate:** % testów niestabilnych
+
+#### 10.4.3 Raportowanie Postępów
+- **Daily:** Status testów w CI/CD
+- **Weekly:** Raport pokrycia i jakości
+- **Sprint:** Podsumowanie błędów i napraw
+- **Release:** Kompletny raport jakości

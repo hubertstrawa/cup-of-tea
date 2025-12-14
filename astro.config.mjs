@@ -10,9 +10,18 @@ import node from "@astrojs/node";
 export default defineConfig({
   output: "server",
   integrations: [react(), sitemap()],
-  server: { port: 3001 },
+  server: { 
+    port: 4321,
+    host: '127.0.0.1'
+  },
   vite: {
     plugins: [tailwindcss()],
+    optimizeDeps: {
+      exclude: ['msw/node', '@mswjs/interceptors', 'msw'],
+    },
+    define: {
+      global: 'globalThis',
+    },
   },
   adapter: node({
     mode: "standalone",
