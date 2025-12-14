@@ -1,18 +1,28 @@
-name: Build and Test
+name: Test & Build Master
 
 on:
   push:
-    branches: [ master ]
+    branches:
+      - master
+  workflow_dispatch:
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Setup Node.js
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-      - run: npm ci
-      - run: npm test
-      - run: npm run build
+          node-version-file: .nvmrc
+
+      - name: Install dependencies
+        run: npm install --force
+
+      - name: Run tests
+        run: npm run test
+
+      - name: Build production
+        run: npm run build
