@@ -37,7 +37,7 @@ export const StudentsPage: React.FC<StudentsPageProps> = ({ userId }) => {
     try {
       setLoading(true);
       const response = await fetch(`/api/teachers/${userId}/students`);
-      
+
       if (!response.ok) {
         throw new Error("Nie udało się pobrać listy uczniów");
       }
@@ -151,11 +151,9 @@ export const StudentsPage: React.FC<StudentsPageProps> = ({ userId }) => {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Moi uczniowie</h1>
-          <p className="text-gray-600 mt-1">
-            Zarządzaj swoimi uczniami i śledź ich postępy
-          </p>
+          <p className="text-gray-600 mt-1">Zarządzaj swoimi uczniami i śledź ich postępy</p>
         </div>
-        <Button>
+        <Button disabled>
           <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
           </svg>
@@ -169,31 +167,46 @@ export const StudentsPage: React.FC<StudentsPageProps> = ({ userId }) => {
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Łączna liczba uczniów</CardTitle>
             <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+              />
             </svg>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{students.length}</div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Lekcje odbyte</CardTitle>
             <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalLessonsCompleted}</div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Lekcje zarezerwowane</CardTitle>
             <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 002 2z" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 002 2z"
+              />
             </svg>
           </CardHeader>
           <CardContent>
@@ -208,9 +221,7 @@ export const StudentsPage: React.FC<StudentsPageProps> = ({ userId }) => {
           <div className="flex justify-between items-center">
             <div>
               <CardTitle>Lista uczniów</CardTitle>
-              <CardDescription>
-                Wszyscy uczniowie przypisani do Twojego konta
-              </CardDescription>
+              <CardDescription>Wszyscy uczniowie przypisani do Twojego konta</CardDescription>
             </div>
             <div className="w-72">
               <Input

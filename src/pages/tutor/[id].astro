@@ -21,7 +21,8 @@ const supabase = createSupabaseServerInstance({
 // Pobranie danych tutora
 const { data: tutor, error: tutorError } = await supabase
   .from("users")
-  .select(`
+  .select(
+    `
     id,
     first_name,
     last_name,
@@ -31,7 +32,8 @@ const { data: tutor, error: tutorError } = await supabase
       lessons_completed,
       lessons_planned
     )
-  `)
+  `
+  )
   .eq("id", id)
   .eq("role", "tutor")
   .single();
@@ -41,8 +43,25 @@ if (tutorError || !tutor) {
 }
 
 // Sprawdzenie czy użytkownik jest zalogowany
-const { data: { session } } = await supabase.auth.getSession();
+const {
+  data: { session },
+} = await supabase.auth.getSession();
 const isLoggedIn = !!session;
+
+// Pobranie danych użytkownika jeśli jest zalogowany
+let isTutor = false;
+
+if (isLoggedIn && session?.user) {
+  const { data: userProfile, error: profileError } = await supabase
+    .from("users")
+    .select("role")
+    .eq("id", session.user.id)
+    .single();
+
+  if (!profileError && userProfile) {
+    isTutor = userProfile.role === "tutor";
+  }
+}
 
 const teacherProfile = tutor.teachers;
 ---
@@ -59,10 +78,11 @@ const teacherProfile = tutor.teachers;
             </span>
           </div>
           <h1 class="text-3xl font-bold text-gray-900 mb-2">
-            {tutor.first_name} {tutor.last_name}
+            {tutor.first_name}
+            {tutor.last_name}
           </h1>
           <p class="text-lg text-gray-600 mb-4">Lektor języków obcych</p>
-          
+
           <!-- {teacherProfile && (
             <div class="flex justify-center space-x-8 text-sm text-gray-500">
               <div class="text-center">
@@ -80,25 +100,54 @@ const teacherProfile = tutor.teachers;
     </div>
 
     <!-- Sekcja z opisem -->
-    {teacherProfile && (teacherProfile.bio || teacherProfile.description) && (
-      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="bg-white rounded-lg shadow-sm p-6">
-          <h2 class="text-xl font-semibold text-gray-900 mb-4">O mnie</h2>
-          {teacherProfile.bio && (
-            <div class="mb-4">
-              <h3 class="font-medium text-gray-900 mb-2">Biografia</h3>
-              <p class="text-gray-700 leading-relaxed">{teacherProfile.bio}</p>
-            </div>
-          )}
-          {teacherProfile.description && (
-            <div>
-              <h3 class="font-medium text-gray-900 mb-2">Opis</h3>
-              <p class="text-gray-700 leading-relaxed">{teacherProfile.description}</p>
-            </div>
-          )}
+    {
+      teacherProfile && (teacherProfile.bio || teacherProfile.description) && (
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div class="bg-white rounded-lg shadow-sm p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">O mnie</h2>
+            {teacherProfile.bio && (
+              <div class="mb-4">
+                <h3 class="font-medium text-gray-900 mb-2">Biografia</h3>
+                <p class="text-gray-700 leading-relaxed">{teacherProfile.bio}</p>
+              </div>
+            )}
+            {teacherProfile.description && (
+              <div>
+                <h3 class="font-medium text-gray-900 mb-2">Opis</h3>
+                <p class="text-gray-700 leading-relaxed">{teacherProfile.description}</p>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-    )}
+      )
+    }
+
+    <!-- Informacja dla nauczycieli -->
+    {
+      isLoggedIn && isTutor && (
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div class="bg-amber-50 border border-amber-200 rounded-lg p-4">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path
+                    fill-rule="evenodd"
+                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </div>
+              <div class="ml-3">
+                <p class="text-sm text-amber-700">
+                  <strong>Jesteś zalogowany jako nauczyciel.</strong> Uczniowie mogą rezerwować Twoje dostępne terminy,
+                  ale Ty nie możesz rezerwować lekcji u innych nauczycieli.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )
+    }
 
     <!-- Sekcja z dostępnymi terminami -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -107,40 +156,49 @@ const teacherProfile = tutor.teachers;
           <h2 class="text-xl font-semibold text-gray-900">Dostępne terminy</h2>
           <p class="text-gray-600 mt-1">
             Wybierz termin, aby umówić się na lekcję
-            {!isLoggedIn && (
-              <span class="text-blue-600"> (wymagane logowanie)</span>
-            )}
+            {!isLoggedIn && <span class="text-blue-600"> (wymagane logowanie)</span>}
           </p>
         </div>
-        
+
         <!-- Komponent z kalendarzem i dostępnymi terminami -->
         <div class="p-6">
-          <PublicAvailabilityChecker tutorId={id} isLoggedIn={isLoggedIn} client:load />
+          <PublicAvailabilityChecker tutorId={id} isLoggedIn={isLoggedIn} isTutor={isTutor} client:load />
         </div>
       </div>
     </div>
 
     <!-- Informacja o konieczności logowania -->
-    {!isLoggedIn && (
-      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
-        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <div class="flex items-center">
-            <div class="flex-shrink-0">
-              <svg class="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-              </svg>
-            </div>
-            <div class="ml-3">
-              <p class="text-sm text-blue-700">
-                <strong>Uwaga:</strong> Aby zarezerwować termin, musisz się
-                <a href={`/login?returnUrl=/tutor/${id}`} class="font-medium underline hover:text-blue-800">zalogować</a>
-                lub
-                <a href={`/register?teacherId=${id}`} class="font-medium underline hover:text-blue-800">utworzyć konto</a>.
-              </p>
+    {
+      !isLoggedIn && (
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+          <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path
+                    fill-rule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </div>
+              <div class="ml-3">
+                <p class="text-sm text-blue-700">
+                  <strong>Uwaga:</strong> Aby zarezerwować termin, musisz się
+                  <a href={`/login?returnUrl=/tutor/${id}`} class="font-medium underline hover:text-blue-800">
+                    zalogować
+                  </a>
+                  lub
+                  <a href={`/register?teacherId=${id}`} class="font-medium underline hover:text-blue-800">
+                    utworzyć konto
+                  </a>
+                  .
+                </p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    )}
+      )
+    }
   </main>
 </Layout>

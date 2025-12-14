@@ -75,8 +75,8 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     // const skipEmailConfirmation = import.meta.env.SKIP_EMAIL_CONFIRMATION === "true";
     // const shouldAutoLogin = isDevelopment || skipEmailConfirmation;
 
-    const shouldAutoLogin = false; // Tymczasowo wyłączone
-    let signInError: any = null;
+    const shouldAutoLogin = true; // Tymczasowo wyłączone
+    const signInError: any = null;
 
     // Profil użytkownika zostanie utworzony automatycznie przez trigger w bazie danych
     // ale sprawdzimy czy się udało
@@ -115,7 +115,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
     // Sprawdź czy automatyczne logowanie się udało
     const isAutoLoggedIn = shouldAutoLogin && !signInError;
-    
+
     return createSuccessResponse(
       {
         user: {

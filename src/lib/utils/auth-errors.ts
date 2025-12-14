@@ -116,7 +116,7 @@ export const createErrorResponse = (error: AuthError, details?: string) => {
 };
 
 // Helper do tworzenia success response dla API
-export const createSuccessResponse = (data: any, statusCode = 200) => {
+export const createSuccessResponse = (data: unknown, statusCode = 200) => {
   return new Response(JSON.stringify(data), {
     status: statusCode,
     headers: { "Content-Type": "application/json" },

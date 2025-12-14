@@ -5,7 +5,6 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import {
   LoginSchema,
   RegisterSchema,
@@ -45,7 +44,7 @@ interface ResetPasswordFormProps extends BaseAuthFormProps {
 
 type AuthFormProps = LoginFormProps | RegisterFormProps | ForgotPasswordFormProps | ResetPasswordFormProps;
 
-const getFormConfig = (mode: AuthMode) => {
+const getFormConfig = (mode: AuthMode, teacherName?: string) => {
   switch (mode) {
     case "login":
       return {
@@ -56,7 +55,9 @@ const getFormConfig = (mode: AuthMode) => {
     case "register":
       return {
         title: "Utwórz konto",
-        description: "Wypełnij formularz aby utworzyć nowe konto",
+        description: teacherName
+          ? `Wypełnij formularz aby utworzyć nowe konto jako uczeń ${teacherName.toUpperCase()}`
+          : "Wypełnij formularz aby utworzyć nowe konto jako lektor",
         submitText: "Utwórz konto",
       };
     case "forgot-password":
@@ -163,36 +164,37 @@ const LoginForm: React.FC<LoginFormProps> = ({ isLoading: externalLoading = fals
 
 // Komponent dla rejestracji
 const RegisterForm: React.FC<RegisterFormProps> = ({ teacherId, isLoading: externalLoading = false, error }) => {
-  const config = getFormConfig("register");
+  const [teacher, setTeacher] = useState<{
+    id: string;
+    first_name: string;
+    last_name: string;
+    teachers: { bio: string | null; description: string | null; lessons_completed: number }[];
+  } | null>(null);
+
+  const config = getFormConfig("register", teacher ? `${teacher.first_name} ${teacher.last_name}` : undefined);
+
   const [submitError, setSubmitError] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
-  const [teachers, setTeachers] = useState<Array<{ id: string; first_name: string; last_name: string; teachers: Array<{ bio: string | null; description: string | null; lessons_completed: number }> }>>([]);
-  const [teachersLoading, setTeachersLoading] = useState(false);
-  const [teachersError, setTeachersError] = useState<string>("");
 
   const {
     register,
     handleSubmit,
-    setValue,
-    watch,
     formState: { errors },
   } = useForm<RegisterFormData>({
     resolver: zodResolver(RegisterSchema),
-    defaultValues: teacherId ? { teacherId, role: "student" } : {},
+    defaultValues: {
+      role: teacherId ? "student" : "tutor",
+      ...(teacherId && { teacherId }),
+    },
   });
 
-  const watchedRole = watch("role");
-
-  // Funkcja do pobierania nauczycieli
-  const fetchTeachers = React.useCallback(async () => {
-    setTeachersLoading(true);
-    setTeachersError("");
-    
+  // Funkcja do pobierania pojedynczego nauczyciela
+  const fetchTeacher = React.useCallback(async (id: string) => {
     try {
-      const res = await fetch("/api/teachers", {
+      const res = await fetch(`/api/teachers/${id}`, {
         method: "GET",
         headers: {
-          "Accept": "application/json",
+          Accept: "application/json",
           "Content-Type": "application/json",
         },
       });
@@ -208,31 +210,23 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ teacherId, isLoading: exter
       }
 
       const data = await res.json();
-      
+
       if (data.success) {
-        setTeachers(data.data || []);
-        setTeachersError("");
+        setTeacher(data.data);
       } else {
-        const errorMsg = data.error || "Unknown error";
-        console.error("API returned error:", errorMsg);
-        setTeachersError("Nie udało się pobrać listy nauczycieli");
-        setTeachers([]);
+        setTeacher(null);
       }
-    } catch (err) {
-      console.error("Error fetching teachers:", err);
-      setTeachersError("Nie udało się pobrać listy nauczycieli. Spróbuj ponownie.");
-      setTeachers([]);
-    } finally {
-      setTeachersLoading(false);
+    } catch {
+      setTeacher(null);
     }
   }, []);
 
-  // Pobierz listę nauczycieli gdy użytkownik wybierze rolę student
+  // Pobierz informacje o nauczycielu gdy teacherId jest obecne
   React.useEffect(() => {
-    if (watchedRole === "student" && !teacherId) {
-      fetchTeachers();
+    if (teacherId) {
+      fetchTeacher(teacherId);
     }
-  }, [watchedRole, teacherId, fetchTeachers]);
+  }, [teacherId, fetchTeacher]);
 
   const handleFormSubmit = async (data: RegisterFormData) => {
     try {
@@ -296,73 +290,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ teacherId, isLoading: exter
               {errors.lastName && <p className="text-sm text-red-600">{errors.lastName.message}</p>}
             </div>
           </div>
-
-          {!teacherId && (
-            <div className="space-y-2">
-              <Label htmlFor="role">Rola</Label>
-              <Select
-                onValueChange={(value) => setValue("role", value as "tutor" | "student")}
-                defaultValue={watchedRole}
-                disabled={loading}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Wybierz rolę" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="tutor">Lektor</SelectItem>
-                  <SelectItem value="student">Uczeń</SelectItem>
-                </SelectContent>
-              </Select>
-              {errors.role && <p className="text-sm text-red-600">{errors.role.message}</p>}
-            </div>
-          )}
-
-          {/* Wybór nauczyciela dla studentów */}
-          {watchedRole === "student" && !teacherId && (
-            <div className="space-y-2">
-              <Label htmlFor="teacherId">Wybierz nauczyciela</Label>
-              {teachersLoading ? (
-                <div className="text-sm text-gray-500">Ładowanie nauczycieli...</div>
-              ) : teachersError ? (
-                <div className="space-y-2">
-                  <div className="text-sm text-red-600">{teachersError}</div>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={fetchTeachers}
-                    disabled={loading || teachersLoading}
-                  >
-                    Spróbuj ponownie
-                  </Button>
-                </div>
-              ) : (
-                <Select
-                  onValueChange={(value) => setValue("teacherId", value)}
-                  disabled={loading || teachersLoading}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Wybierz nauczyciela" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {teachers.length > 0 ? (
-                      teachers.map((teacher) => (
-                        <SelectItem key={teacher.id} value={teacher.id}>
-                          {teacher.first_name} {teacher.last_name}
-                          {teacher.teachers[0]?.lessons_completed ? ` (${teacher.teachers[0].lessons_completed} lekcji)` : ""}
-                        </SelectItem>
-                      ))
-                    ) : (
-                      <SelectItem value="" disabled>
-                        Brak dostępnych nauczycieli
-                      </SelectItem>
-                    )}
-                  </SelectContent>
-                </Select>
-              )}
-              {errors.teacherId && <p className="text-sm text-red-600">{errors.teacherId.message}</p>}
-            </div>
-          )}
 
           {teacherId && <input type="hidden" {...register("teacherId")} value={teacherId} />}
 
@@ -453,8 +380,8 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ isLoading: exte
               </div>
             )}
 
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Ładowanie..." : config.submitText}
+            <Button type="submit" className="w-full" disabled /* ={loading}*/ name="forgot-password">
+              {loading ? "Ładowanie..." : ` ${config.submitText} (niedostępne w MVP)`}
             </Button>
 
             <div className="space-y-2 text-center text-sm">

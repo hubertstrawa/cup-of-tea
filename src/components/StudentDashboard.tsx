@@ -49,12 +49,12 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ studentId })
       try {
         setLoading(true);
         setError(null);
-        
+
         // Fetch lessons
         const lessonsResponse = await fetch(`/api/students/${studentId}/lessons`);
         if (!lessonsResponse.ok) {
           const errorData = await lessonsResponse.json();
-          console.error('Lessons API error:', errorData);
+          console.error("Lessons API error:", errorData);
           throw new Error(`Failed to fetch lessons: ${errorData.error || lessonsResponse.statusText}`);
         }
         const lessonsData = await lessonsResponse.json();
@@ -65,16 +65,15 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ studentId })
         const teachersResponse = await fetch(`/api/students/${studentId}/teachers`);
         if (!teachersResponse.ok) {
           const errorData = await teachersResponse.json();
-          console.error('Teachers API error:', errorData);
+          console.error("Teachers API error:", errorData);
           throw new Error(`Failed to fetch teachers: ${errorData.error || teachersResponse.statusText}`);
         }
         const teachersData = await teachersResponse.json();
         setTeachers(teachersData.teachers || []);
-        console.log('teachersData', teachersData)
-
+        console.log("teachersData", teachersData);
       } catch (err) {
-        console.error('Error fetching student data:', err);
-        setError(err instanceof Error ? err.message : 'An error occurred');
+        console.error("Error fetching student data:", err);
+        setError(err instanceof Error ? err.message : "An error occurred");
       } finally {
         setLoading(false);
       }
@@ -87,23 +86,23 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ studentId })
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('pl-PL', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
+    return date.toLocaleDateString("pl-PL", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'scheduled':
+      case "scheduled":
         return <Badge variant="default">Zaplanowana</Badge>;
-      case 'completed':
+      case "completed":
         return <Badge variant="secondary">Ukończona</Badge>;
-      case 'cancelled':
+      case "cancelled":
         return <Badge variant="destructive">Anulowana</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
@@ -142,7 +141,12 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ studentId })
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Zbliżające się lekcje</CardTitle>
             <svg className="h-4 w-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
             </svg>
           </CardHeader>
           <CardContent>
@@ -154,7 +158,12 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ studentId })
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Ukończone lekcje</CardTitle>
             <svg className="h-4 w-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
           </CardHeader>
           <CardContent>
@@ -166,7 +175,12 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ studentId })
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Moi lektorzy</CardTitle>
             <svg className="h-4 w-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"
+              />
             </svg>
           </CardHeader>
           <CardContent>
@@ -180,16 +194,12 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ studentId })
         <Card>
           <CardHeader>
             <CardTitle>Zbliżające się lekcje</CardTitle>
-            <CardDescription>
-              Twoje nadchodzące lekcje z lektorami
-            </CardDescription>
+            <CardDescription>Twoje nadchodzące lekcje z lektorami</CardDescription>
           </CardHeader>
           <CardContent>
             <ScrollArea className="h-[400px]">
               {upcomingLessons.length === 0 ? (
-                <div className="text-center text-gray-500 py-8">
-                  Brak zaplanowanych lekcji
-                </div>
+                <div className="text-center text-gray-500 py-8">Brak zaplanowanych lekcji</div>
               ) : (
                 <div className="space-y-4">
                   {upcomingLessons.map((lesson) => (
@@ -203,16 +213,10 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ studentId })
                         <p className="text-sm font-medium text-gray-900 truncate">
                           {lesson.teacher.firstName} {lesson.teacher.lastName}
                         </p>
-                        <p className="text-sm text-gray-500">
-                          {formatDate(lesson.scheduledAt)}
-                        </p>
-                        <p className="text-xs text-gray-400">
-                          {lesson.durationMinutes} minut
-                        </p>
+                        <p className="text-sm text-gray-500">{formatDate(lesson.scheduledAt)}</p>
+                        <p className="text-xs text-gray-400">{lesson.durationMinutes} minut</p>
                       </div>
-                      <div className="flex flex-col items-end space-y-1">
-                        {getStatusBadge(lesson.status)}
-                      </div>
+                      <div className="flex flex-col items-end space-y-1">{getStatusBadge(lesson.status)}</div>
                     </div>
                   ))}
                 </div>
@@ -225,18 +229,14 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ studentId })
         <Card>
           <CardHeader>
             <CardTitle>Moi lektorzy</CardTitle>
-            <CardDescription>
-              Lista twoich lektorów i postępy w nauce
-            </CardDescription>
+            <CardDescription>Lista twoich lektorów i postępy w nauce</CardDescription>
           </CardHeader>
           <CardContent>
             <ScrollArea className="h-[400px]">
               {teachers.length === 0 ? (
                 <div className="text-center text-gray-500 py-8">
                   <p>Nie masz jeszcze przypisanych lektorów</p>
-                  <p className="text-sm mt-2">
-                    Aby zacząć naukę, umów pierwszą lekcję z lektorem.
-                  </p>
+                  <p className="text-sm mt-2">Aby zacząć naukę, umów pierwszą lekcję z lektorem.</p>
                   <Button variant="outline" className="mt-4">
                     <a href="/teachers">Przeglądaj lektorów</a>
                   </Button>
@@ -255,23 +255,19 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ studentId })
                           <p className="text-sm font-medium text-gray-900 truncate">
                             {teacher.firstName} {teacher.lastName}
                           </p>
-                          <p className="text-xs text-gray-500 truncate">
-                            {teacher.email}
-                          </p>
+                          <p className="text-xs text-gray-500 truncate">{teacher.email}</p>
                         </div>
                       </div>
-                      
-                      {teacher.bio && (
-                        <p className="text-sm text-gray-600 mb-2">{teacher.bio}</p>
-                      )}
-                      
+
+                      {teacher.bio && <p className="text-sm text-gray-600 mb-2">{teacher.bio}</p>}
+
                       <div className="flex justify-between text-xs text-gray-500">
                         <span>Ukończone lekcje: {teacher.lessonsCompleted}</span>
                         <span>Zarezerwowane: {teacher.lessonsReserved}</span>
                       </div>
-                      
+
                       <Separator className="my-2" />
-                      
+
                       <div className="flex justify-end items-center">
                         {/* <span className="text-xs text-gray-400">
                           Doświadczenie: {teacher.totalLessonsCompleted} lekcji
@@ -293,16 +289,12 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ studentId })
       <Card>
         <CardHeader>
           <CardTitle>Ostatnie ukończone lekcje</CardTitle>
-          <CardDescription>
-            Historia twoich ostatnich lekcji
-          </CardDescription>
+          <CardDescription>Historia twoich ostatnich lekcji</CardDescription>
         </CardHeader>
         <CardContent>
           <ScrollArea className="h-[300px]">
             {completedLessons.length === 0 ? (
-              <div className="text-center text-gray-500 py-8">
-                Brak ukończonych lekcji
-              </div>
+              <div className="text-center text-gray-500 py-8">Brak ukończonych lekcji</div>
             ) : (
               <div className="space-y-4">
                 {completedLessons.slice(0, 10).map((lesson) => (
@@ -317,15 +309,11 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ studentId })
                         <p className="text-sm font-medium text-gray-900">
                           {lesson.teacher.firstName} {lesson.teacher.lastName}
                         </p>
-                        <p className="text-sm text-gray-500">
-                          {formatDate(lesson.scheduledAt)}
-                        </p>
+                        <p className="text-sm text-gray-500">{formatDate(lesson.scheduledAt)}</p>
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <span className="text-xs text-gray-400">
-                        {lesson.durationMinutes} min
-                      </span>
+                      <span className="text-xs text-gray-400">{lesson.durationMinutes} min</span>
                       {getStatusBadge(lesson.status)}
                     </div>
                   </div>

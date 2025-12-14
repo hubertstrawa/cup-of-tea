@@ -33,13 +33,13 @@ export const LessonsPage: React.FC<LessonsPageProps> = ({ userId }) => {
   const { toast } = useToast();
 
   const filteredLessons = lessons.filter((lesson) => {
-    const matchesSearch = 
+    const matchesSearch =
       lesson.student.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       lesson.student.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       lesson.student.email.toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     const matchesStatus = statusFilter === "all" || lesson.status === statusFilter;
-    
+
     return matchesSearch && matchesStatus;
   });
 
@@ -47,7 +47,7 @@ export const LessonsPage: React.FC<LessonsPageProps> = ({ userId }) => {
     try {
       setLoading(true);
       const response = await fetch(`/api/teachers/${userId}/lessons`);
-      
+
       if (!response.ok) {
         throw new Error("Nie udało się pobrać listy lekcji");
       }
@@ -70,7 +70,7 @@ export const LessonsPage: React.FC<LessonsPageProps> = ({ userId }) => {
     fetchLessons();
   }, [userId]);
 
-  const handleEditLesson = (lessonId: string) => {
+  const handleEditLesson = (/*lessonId: string*/) => {
     // Navigate to lesson edit page or open edit modal
     toast({
       title: "Funkcja w przygotowaniu",
@@ -152,9 +152,9 @@ export const LessonsPage: React.FC<LessonsPageProps> = ({ userId }) => {
   const getStatusCounts = () => {
     return {
       all: lessons.length,
-      planned: lessons.filter(l => l.status === "planned").length,
-      completed: lessons.filter(l => l.status === "completed").length,
-      canceled: lessons.filter(l => l.status === "canceled").length,
+      planned: lessons.filter((l) => l.status === "planned").length,
+      completed: lessons.filter((l) => l.status === "completed").length,
+      canceled: lessons.filter((l) => l.status === "canceled").length,
     };
   };
 
@@ -206,13 +206,16 @@ export const LessonsPage: React.FC<LessonsPageProps> = ({ userId }) => {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Moje lekcje</h1>
-          <p className="text-gray-600 mt-1">
-            Zarządzaj swoimi lekcjami i śledź ich status
-          </p>
+          <p className="text-gray-600 mt-1">Zarządzaj swoimi lekcjami i śledź ich status</p>
         </div>
         <Button>
           <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 002 2z" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 002 2z"
+            />
           </svg>
           Dodaj lekcję
         </Button>
@@ -224,38 +227,53 @@ export const LessonsPage: React.FC<LessonsPageProps> = ({ userId }) => {
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Wszystkie lekcje</CardTitle>
             <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+              />
             </svg>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{statusCounts.all}</div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Zaplanowane</CardTitle>
             <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-blue-600">{statusCounts.planned}</div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Zakończone</CardTitle>
             <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">{statusCounts.completed}</div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Anulowane</CardTitle>
@@ -275,9 +293,7 @@ export const LessonsPage: React.FC<LessonsPageProps> = ({ userId }) => {
           <div className="flex justify-between items-center">
             <div>
               <CardTitle>Lista lekcji</CardTitle>
-              <CardDescription>
-                Wszystkie lekcje przypisane do Twojego konta
-              </CardDescription>
+              <CardDescription>Wszystkie lekcje przypisane do Twojego konta</CardDescription>
             </div>
             <div className="flex space-x-4">
               <Select value={statusFilter} onValueChange={setStatusFilter}>

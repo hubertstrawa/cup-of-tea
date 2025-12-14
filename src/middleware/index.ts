@@ -20,6 +20,7 @@ const PUBLIC_PATHS = [
   "/api/auth/user",
   // Public API endpoints
   "/api/public",
+  "/api/teachers",
   // Static assets
   "/favicon.png",
   "/_astro",

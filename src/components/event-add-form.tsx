@@ -1,4 +1,3 @@
-
 import React, { useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -8,9 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "./ui/textarea";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { PlusIcon } from "lucide-react";
-import { HexColorPicker } from "react-colorful";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -136,7 +133,7 @@ export function EventAddForm({ start, end }: EventAddFormProps) {
       <AlertDialogTrigger className="flex" asChild>
         <Button className="w-38 md:w-44 text-xs md:text-sm" variant="default" onClick={() => setEventAddOpen(true)}>
           <PlusIcon className="md:h-5 md:w-5 h-3 w-3" />
-          <p>Dodaj wydarzenie</p>
+          <p>Dodaj termin</p>
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
@@ -172,7 +169,7 @@ export function EventAddForm({ start, end }: EventAddFormProps) {
                 </FormItem>
               )}
             />
-            <FormField 
+            <FormField
               control={form.control}
               name="status"
               render={({ field }) => (
