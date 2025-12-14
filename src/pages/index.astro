@@ -1,0 +1,309 @@
+---
+import Layout from "../layouts/Layout.astro";
+
+const tutorDemoId = "demo-teacher";
+const bookingLink = `/tutor/${tutorDemoId}`;
+const loginLink = "/login";
+const registerLink = "/register";
+---
+
+<Layout title="Cup of Tea — zarządzanie kalendarzem i rezerwacje">
+  <main class="min-h-screen bg-slate-950 text-slate-50">
+    <div class="relative overflow-hidden">
+      <div
+        class="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(59,130,246,0.18),transparent_30%),radial-gradient(circle_at_80%_0%,rgba(236,72,153,0.15),transparent_25%),radial-gradient(circle_at_50%_100%,rgba(34,211,238,0.12),transparent_28%)]"
+      >
+      </div>
+      <div class="absolute inset-0 bg-gradient-to-b from-slate-950/40 via-slate-950 to-slate-950"></div>
+
+      <div class="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+        <header class="flex items-center justify-between mb-10">
+          <div class="flex items-center gap-3">
+            <div
+              class="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center text-lg font-bold text-white shadow-lg shadow-blue-500/30"
+            >
+              C
+            </div>
+            <div>
+              <p class="text-sm text-slate-300">Cup Of Tea</p>
+              <p class="text-xs text-slate-400">Planowanie lekcji bez chaosu</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <a href={loginLink} class="text-sm text-slate-200 hover:text-white transition-colors">Zaloguj się</a>
+            <a
+              href={registerLink}
+              class="inline-flex items-center gap-2 rounded-full bg-white text-slate-900 px-4 py-2 text-sm font-semibold shadow-lg shadow-white/10 hover:-translate-y-0.5 transition-transform"
+            >
+              Załóż konto
+              <span aria-hidden="true">→</span>
+            </a>
+          </div>
+        </header>
+
+        <section class="grid lg:grid-cols-[1.2fr,0.8fr] gap-10 items-center">
+          <div class="space-y-6">
+            <p
+              class="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm text-blue-100 ring-1 ring-white/15"
+            >
+              <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
+              Nowoczesny system dla lektorów i uczniów
+            </p>
+            <h1 class="text-4xl sm:text-5xl font-semibold leading-tight text-white">
+              Zarządzaj kalendarzem, automatyzuj rezerwacje i buduj relacje z uczniami.
+            </h1>
+            <p class="text-lg text-slate-300 max-w-2xl">
+              Cup Of Tea to centrum pracy lektora językowego: dostępność, rezerwacje, płatności i statystyki w jednym
+              miejscu. Uczniowie rezerwują termin w kilka kliknięć, a Ty skupiasz się na lekcjach.
+            </p>
+            <div class="flex flex-wrap items-center gap-3">
+              <a
+                href={loginLink}
+                class="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-blue-500 to-cyan-400 px-5 py-3 font-semibold text-white shadow-lg shadow-cyan-500/25 hover:-translate-y-0.5 transition-transform"
+              >
+                Przejdź do logowania
+                <span aria-hidden="true">↗</span>
+              </a>
+              <a
+                href={registerLink}
+                class="inline-flex items-center justify-center gap-2 rounded-lg border border-white/15 px-5 py-3 font-semibold text-white/90 hover:text-white hover:border-white/30 transition-colors"
+              >
+                Zarejestruj się jako lektor
+              </a>
+              <a
+                href={bookingLink}
+                class="inline-flex items-center gap-2 text-sm text-cyan-200 hover:text-cyan-100 underline underline-offset-4 decoration-cyan-300/70"
+              >
+                Zobacz przykładową dostępność lektora
+                <span aria-hidden="true">→</span>
+              </a>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+              <div class="rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white">
+                <p class="text-2xl font-semibold">2x</p>
+                <p class="text-slate-300">szybsze umawianie lekcji</p>
+              </div>
+              <div class="rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white">
+                <p class="text-2xl font-semibold">24/7</p>
+                <p class="text-slate-300">rezerwacje przez uczniów</p>
+              </div>
+              <div class="rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white">
+                <p class="text-2xl font-semibold">Zero</p>
+                <p class="text-slate-300">duplikatów i pomyłek</p>
+              </div>
+              <div class="rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white">
+                <p class="text-2xl font-semibold">Pełny</p>
+                <p class="text-slate-300">wgląd w statystyki</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="relative">
+            <div class="absolute -left-6 -top-6 h-28 w-28 rounded-full bg-cyan-400/20 blur-3xl"></div>
+            <div class="absolute -right-8 -bottom-10 h-36 w-36 rounded-full bg-fuchsia-400/20 blur-3xl"></div>
+            <div
+              class="relative rounded-2xl border border-white/10 bg-white/5 p-6 shadow-2xl shadow-blue-900/30 backdrop-blur"
+            >
+              <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                  <div
+                    class="h-10 w-10 rounded-full bg-blue-500/20 text-blue-200 flex items-center justify-center font-semibold"
+                  >
+                    AN
+                  </div>
+                  <div>
+                    <p class="text-sm text-slate-300">Lektor</p>
+                    <p class="font-semibold text-white">Anna Nowak</p>
+                  </div>
+                </div>
+                <span class="rounded-full bg-emerald-500/20 text-emerald-200 px-3 py-1 text-xs font-semibold"
+                  >Online</span
+                >
+              </div>
+              <div class="rounded-xl border border-white/10 bg-slate-900/60 p-4 space-y-4">
+                <div class="flex items-center justify-between text-sm text-slate-200">
+                  <span>Wtorek, 10:00</span>
+                  <span class="rounded-md bg-emerald-500/15 text-emerald-200 px-2 py-1 text-xs">Wolny termin</span>
+                </div>
+                <div class="flex items-center justify-between text-sm text-slate-200">
+                  <span>Czwartek, 17:30</span>
+                  <span class="rounded-md bg-emerald-500/15 text-emerald-200 px-2 py-1 text-xs">Wolny termin</span>
+                </div>
+                <div class="flex items-center justify-between text-sm text-slate-200">
+                  <span>Piątek, 08:00</span>
+                  <span class="rounded-md bg-amber-500/15 text-amber-200 px-2 py-1 text-xs">Rezerwacja w toku</span>
+                </div>
+                <p class="text-xs text-slate-400">
+                  Uczniowie rezerwują w czasie rzeczywistym, a Ty otrzymujesz powiadomienie i statystyki.
+                </p>
+                <a
+                  href={bookingLink}
+                  class="inline-flex items-center justify-center gap-2 w-full rounded-lg bg-gradient-to-r from-emerald-400 to-cyan-400 px-4 py-3 text-slate-900 font-semibold hover:brightness-110 transition"
+                >
+                  Zobacz widok ucznia (soon)
+                  <span aria-hidden="true">↗</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="mt-16 grid lg:grid-cols-3 gap-6">
+          <div class="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur">
+            <p class="text-xs uppercase tracking-[0.2em] text-blue-200 mb-2">Dla lektora</p>
+            <h2 class="text-xl font-semibold text-white mb-3">Pełna kontrola nad kalendarzem</h2>
+            <p class="text-slate-300 mb-4">
+              Dodawaj, edytuj i blokuj terminy. Widzisz rezerwacje w jednym miejscu i unikasz podwójnych zapisów.
+            </p>
+            <ul class="space-y-2 text-sm text-slate-200">
+              <li class="flex items-start gap-2">
+                <span class="text-emerald-300">•</span> Automatyczne powiadomienia dla uczniów
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-emerald-300">•</span> Widok dostępności na dowolny dzień
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-emerald-300">•</span> Statystyki lekcji i płatności
+              </li>
+            </ul>
+          </div>
+          <div class="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur">
+            <p class="text-xs uppercase tracking-[0.2em] text-cyan-200 mb-2">Dla ucznia</p>
+            <h2 class="text-xl font-semibold text-white mb-3">Rezerwacja w kilka kliknięć</h2>
+            <p class="text-slate-300 mb-4">
+              Lista dostępnych godzin w czasie rzeczywistym. Klikasz termin, logujesz się lub zakładasz konto i gotowe.
+            </p>
+            <ul class="space-y-2 text-sm text-slate-200">
+              <li class="flex items-start gap-2">
+                <span class="text-emerald-300">•</span> Przejrzyste oznaczenia dostępności
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-emerald-300">•</span> Historia odbytych i planowanych lekcji
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-emerald-300">•</span> Link od lektora z przypisaniem do jego kalendarza
+              </li>
+            </ul>
+          </div>
+          <div
+            class="rounded-2xl border border-white/10 bg-gradient-to-br from-blue-500/20 via-cyan-500/20 to-emerald-400/15 p-6 backdrop-blur"
+          >
+            <p class="text-xs uppercase tracking-[0.2em] text-emerald-100 mb-2">Ścieżka</p>
+            <h2 class="text-xl font-semibold text-white mb-3">Jak to działa</h2>
+            <ol class="space-y-3 text-sm text-slate-200">
+              <li class="flex items-start gap-3">
+                <span class="rounded-full bg-white/10 px-2 py-1 text-xs font-semibold text-white mt-0.5">1</span>
+                Załóż konto i ustaw dostępne terminy.
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="rounded-full bg-white/10 px-2 py-1 text-xs font-semibold text-white mt-0.5">2</span>
+                Wyślij uczniom link do swojego kalendarza lub zapisów.
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="rounded-full bg-white/10 px-2 py-1 text-xs font-semibold text-white mt-0.5">3</span>
+                Odbieraj rezerwacje, prowadź lekcje, śledź postępy i płatności.
+              </li>
+            </ol>
+          </div>
+        </section>
+
+        <section class="mt-16 rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur">
+          <div class="flex flex-col md:flex-row items-center gap-8">
+            <div class="flex-1 space-y-3">
+              <p class="text-sm text-cyan-200 font-semibold">Przykład dla ucznia</p>
+              <h3 class="text-2xl font-semibold text-white">Zarezerwuj termin u konkretnego lektora</h3>
+              <p class="text-slate-300">
+                Wyślij uczniom link do swojej podstrony, np.
+                <span class="font-semibold text-white">/tutor/{tutorDemoId}</span>. Uczeń zobaczy Twoją dostępność,
+                wybierze godzinę i potwierdzi rezerwację. Dla nowych uczniów przydatny jest link rejestracyjny z
+                przypisaniem do lektora.
+              </p>
+              <div class="flex flex-wrap gap-3">
+                <a
+                  href={bookingLink}
+                  class="inline-flex items-center gap-2 rounded-lg bg-white text-slate-900 px-4 py-2 font-semibold shadow-lg shadow-white/15 hover:-translate-y-0.5 transition-transform"
+                >
+                  Zobacz demo kalendarza
+                  <span aria-hidden="true">↗</span>
+                </a>
+                <a
+                  href={`${registerLink}?teacherId=${tutorDemoId}`}
+                  class="inline-flex items-center gap-2 rounded-lg border border-white/20 px-4 py-2 font-semibold text-white hover:border-white/40 transition-colors"
+                >
+                  Link dla nowych uczniów
+                </a>
+              </div>
+            </div>
+            <div class="flex-1 w-full">
+              <div class="rounded-2xl border border-white/10 bg-slate-900/70 p-6 shadow-xl shadow-slate-900/40">
+                <div class="flex items-center justify-between mb-4">
+                  <div>
+                    <p class="text-xs text-slate-400">Twoi uczniowie widzą</p>
+                    <p class="text-lg font-semibold text-white">Dostępne terminy</p>
+                  </div>
+                  <span class="rounded-full bg-emerald-500/20 text-emerald-200 px-3 py-1 text-xs font-semibold"
+                    >Live</span
+                  >
+                </div>
+                <div class="space-y-3 text-sm text-slate-200">
+                  <div class="flex items-center justify-between rounded-lg border border-white/10 px-4 py-3">
+                    <div>
+                      <p class="font-semibold">Wtorek, 14:00</p>
+                      <p class="text-xs text-slate-400">Lekcja konwersacyjna · 60 min</p>
+                    </div>
+                    <span class="text-emerald-300 text-xs">Do rezerwacji</span>
+                  </div>
+                  <div class="flex items-center justify-between rounded-lg border border-white/10 px-4 py-3">
+                    <div>
+                      <p class="font-semibold">Środa, 09:30</p>
+                      <p class="text-xs text-slate-400">Przygotowanie do egzaminu · 90 min</p>
+                    </div>
+                    <span class="text-emerald-300 text-xs">Do rezerwacji</span>
+                  </div>
+                  <div class="flex items-center justify-between rounded-lg border border-white/10 px-4 py-3 opacity-70">
+                    <div>
+                      <p class="font-semibold">Czwartek, 18:00</p>
+                      <p class="text-xs text-slate-400">Zajęte przez innego ucznia</p>
+                    </div>
+                    <span class="text-amber-300 text-xs">Zajęty</span>
+                  </div>
+                  <p class="text-xs text-slate-400">
+                    Możesz dodać własny opis lekcji i ustawić limit rezerwacji. Uczniowie widzą tylko dostępne okna
+                    czasowe.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="mt-16 mb-6 text-center">
+          <div
+            class="inline-flex items-center gap-3 rounded-full bg-white/10 px-4 py-2 text-sm text-slate-100 ring-1 ring-white/15"
+          >
+            <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
+            Gotowy, aby uporządkować swój kalendarz?
+          </div>
+          <h4 class="mt-4 text-3xl font-semibold text-white">Zacznij za darmo — logowanie lub rejestracja</h4>
+          <div class="mt-6 flex flex-wrap justify-center gap-3">
+            <a
+              href={loginLink}
+              class="inline-flex items-center gap-2 rounded-lg bg-white text-slate-900 px-5 py-3 font-semibold shadow-lg shadow-white/20 hover:-translate-y-0.5 transition-transform"
+            >
+              Przejdź do logowania
+              <span aria-hidden="true">→</span>
+            </a>
+            <a
+              href={registerLink}
+              class="inline-flex items-center gap-2 rounded-lg border border-white/15 px-5 py-3 font-semibold text-white hover:border-white/30 transition-colors"
+            >
+              Załóż konto jako lektor
+            </a>
+          </div>
+          <p class="mt-3 text-sm text-slate-400">Bez chaosu, bez nadpisywania terminów, z myślą o Twoich uczniach.</p>
+        </section>
+      </div>
+    </div>
+  </main>
+</Layout>

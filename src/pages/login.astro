@@ -24,6 +24,7 @@ if (user) {
 const url = new URL(Astro.request.url);
 const message = url.searchParams.get("message");
 const redirectUrl = url.searchParams.get("redirect");
+const teacherId = url.searchParams.get("teacherId");
 
 let displayMessage = "";
 if (message === "confirm-email") {
@@ -52,7 +53,7 @@ if (redirectUrl) {
         )
       }
 
-      <AuthForm mode="login" redirectUrl={redirectUrl || undefined} client:load />
+      <AuthForm mode="login" redirectUrl={redirectUrl || undefined} teacherId={teacherId || undefined} client:load />
     </div>
   </main>
 </Layout>

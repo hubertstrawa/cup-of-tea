@@ -43,14 +43,14 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ user }) => {
 
         const response = await fetch(`/api/stats/${user.id}`);
         if (!response.ok) {
-          throw new Error('Failed to fetch statistics');
+          throw new Error("Failed to fetch statistics");
         }
 
         const data = await response.json();
         setStats(data);
       } catch (err) {
-        console.error('Error fetching stats:', err);
-        setError('Nie udało się pobrać statystyk');
+        console.error("Error fetching stats:", err);
+        setError("Nie udało się pobrać statystyk");
       } finally {
         setLoading(false);
       }
@@ -192,15 +192,11 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ user }) => {
                   <Skeleton className="h-20 w-full rounded-lg" />
                 </>
               ) : error ? (
-                <div className="text-center p-4 text-red-600">
-                  {error}
-                </div>
+                <div className="text-center p-4 text-red-600">{error}</div>
               ) : user.role === "tutor" ? (
                 <>
                   <div className="text-center p-4 bg-blue-50 rounded-lg">
-                    <div className="text-2xl font-bold text-blue-600">
-                      {(stats as TutorStats)?.activeStudents || 0}
-                    </div>
+                    <div className="text-2xl font-bold text-blue-600">{(stats as TutorStats)?.activeStudents || 0}</div>
                     <div className="text-sm text-blue-600">Aktywni uczniowie</div>
                   </div>
                   <div className="text-center p-4 bg-green-50 rounded-lg">
@@ -231,9 +227,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ user }) => {
                     <div className="text-sm text-green-600">Zaplanowane lekcje</div>
                   </div>
                   <div className="text-center p-4 bg-purple-50 rounded-lg">
-                    <div className="text-2xl font-bold text-purple-600">
-                      {(stats as StudentStats)?.totalHours || 0}
-                    </div>
+                    <div className="text-2xl font-bold text-purple-600">{(stats as StudentStats)?.totalHours || 0}</div>
                     <div className="text-sm text-purple-600">Godziny nauki</div>
                   </div>
                 </>
@@ -248,28 +242,32 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ user }) => {
             <CardContent className="space-y-3">
               {user.role === "tutor" ? (
                 <>
-                  <Button variant="outline" className="w-full justify-start">
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2z"
-                      />
-                    </svg>
-                    Zarządzaj kalendarzem
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start">
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
-                      />
-                    </svg>
-                    Lista uczniów
-                  </Button>
+                  <a href="/dashboard" className="block">
+                    <Button variant="outline" className="w-full justify-start">
+                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2z"
+                        />
+                      </svg>
+                      Zarządzaj kalendarzem
+                    </Button>
+                  </a>
+                  <a href="/dashboard/students" className="block">
+                    <Button variant="outline" className="w-full justify-start">
+                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
+                        />
+                      </svg>
+                      Lista uczniów
+                    </Button>
+                  </a>
                 </>
               ) : (
                 <>

@@ -3,8 +3,11 @@ import { createSupabaseServerInstance } from "../db/supabase.client.ts";
 import type { AuthUser } from "../env.d.ts";
 
 // Publiczne ścieżki - strony auth i API endpoints
-const PUBLIC_PATHS = [
-  "/tutor/",
+const PUBLIC_PATH_PREFIXES = ["/tutor/", "/booking/", "/api/auth/", "/api/public/", "/_astro/"];
+
+const PUBLIC_TEACHER_INFO_PATH = /^\/api\/teachers\/[A-Za-z0-9-]+\/?$/;
+
+const PUBLIC_PATH_EXACT = [
   "/login",
   "/register",
   "/forgot-password",
@@ -23,10 +26,24 @@ const PUBLIC_PATHS = [
   "/api/teachers",
   // Static assets
   "/favicon.png",
-  "/_astro",
 ];
 
 export const onRequest = defineMiddleware(async ({ locals, cookies, url, request, redirect }, next) => {
+  // Strona główna jest publiczna
+  if (url.pathname === "/") {
+    return next();
+  }
+
+  // Sprawdzenie czy ścieżka jest publiczna
+  const isPublicPath =
+    PUBLIC_PATH_EXACT.includes(url.pathname) ||
+    PUBLIC_PATH_PREFIXES.some((path) => url.pathname.startsWith(path)) ||
+    PUBLIC_TEACHER_INFO_PATH.test(url.pathname);
+
+  if (isPublicPath) {
+    return next();
+  }
+
   // Utworzenie SSR-compatible Supabase instance
   const supabase = createSupabaseServerInstance({
     cookies,
@@ -35,13 +52,6 @@ export const onRequest = defineMiddleware(async ({ locals, cookies, url, request
 
   // Dodanie supabase do locals dla kompatybilności wstecznej
   locals.supabase = supabase;
-
-  // Sprawdzenie czy ścieżka jest publiczna
-  const isPublicPath = PUBLIC_PATHS.some((path) => url.pathname.startsWith(path));
-
-  if (isPublicPath) {
-    return next();
-  }
 
   // WAŻNE: Zawsze pobierz sesję użytkownika przed innymi operacjami
   const {

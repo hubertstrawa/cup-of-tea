@@ -91,7 +91,8 @@ export default function PublicAvailabilityChecker({ tutorId, isLoggedIn, isTutor
     if (!isLoggedIn) {
       // Przekieruj do logowania z informacją o wybranym terminie
       const bookingUrl = `/booking/${slot.id}`;
-      window.location.href = `/login?redirect=${encodeURIComponent(bookingUrl)}`;
+      const loginUrl = `/login?redirect=${encodeURIComponent(bookingUrl)}&teacherId=${encodeURIComponent(tutorId)}`;
+      window.location.href = loginUrl;
       return;
     }
 

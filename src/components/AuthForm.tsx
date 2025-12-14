@@ -27,6 +27,7 @@ interface BaseAuthFormProps {
 interface LoginFormProps extends BaseAuthFormProps {
   mode: "login";
   redirectUrl?: string;
+  teacherId?: string;
 }
 
 interface RegisterFormProps extends BaseAuthFormProps {
@@ -76,7 +77,7 @@ const getFormConfig = (mode: AuthMode, teacherName?: string) => {
 };
 
 // Komponent dla logowania
-const LoginForm: React.FC<LoginFormProps> = ({ isLoading: externalLoading = false, error, redirectUrl }) => {
+const LoginForm: React.FC<LoginFormProps> = ({ isLoading: externalLoading = false, error, redirectUrl, teacherId }) => {
   const config = getFormConfig("login");
   const [submitError, setSubmitError] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
@@ -151,7 +152,10 @@ const LoginForm: React.FC<LoginFormProps> = ({ isLoading: externalLoading = fals
             </div>
             <div>
               Nie masz konta?{" "}
-              <a href="/register" className="text-blue-600 hover:text-blue-800 hover:underline">
+              <a
+                href={teacherId ? `/register?teacherId=${encodeURIComponent(teacherId)}` : "/register"}
+                className="text-blue-600 hover:text-blue-800 hover:underline"
+              >
                 Zarejestruj się
               </a>
             </div>
